@@ -1,107 +1,217 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>پروژه آلف — TemplateOS + XML</title>
-
-    <style>
-        body {
-            margin: 0;
-            background: #0c0c0c;
-            font-family: sans-serif;
-            color: #e5e5e5;
-        }
-
-        header {
-            padding: 20px;
-            background: #111;
-            border-bottom: 1px solid #333;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .window {
-            margin: 30px auto;
-            width: 90%;
-            max-width: 900px;
-            background: #181818;
-            border: 1px solid #333;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 0 20px #000;
-        }
-
-        .xml {
-            font-family: "Courier New", monospace;
-            background: #101010;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            white-space: pre-wrap;
-            direction: ltr;
-            text-align: left;
-            font-size: 14px;
-            overflow-x: auto;
-        }
-
-        .section-title {
-            font-size: 20px;
-            margin-bottom: 10px;
-            color: #4af;
-        }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>آلف — SiteBuilder (TemplateOS + XML) — Preview</title>
+<style>
+  :root{--bg:#0f1114;--panel:#121417;--accent:#3bd0ff;--text:#e6eef6}
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#07080a,#0f1114);color:var(--text);font-family:Tahoma,system-ui,Segoe UI,Roboto}
+  header{padding:14px 18px;background:linear-gradient(90deg,#07080a,#0c1116);display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,0.03)}
+  header h1{font-size:18px;margin:0;font-weight:600}
+  .wrap{display:flex;gap:12px;padding:16px}
+  .col{background:var(--panel);border-radius:10px;padding:12px;box-shadow:0 6px 20px rgba(0,0,0,.6);min-height:420px}
+  .left{width:36%;display:flex;flex-direction:column}
+  .mid{width:40%}
+  .right{width:24%;display:flex;flex-direction:column}
+  .title{font-weight:600;color:var(--accent);margin-bottom:8px}
+  textarea.xml{width:100%;height:320px;background:#0b0c0e;color:var(--text);border-radius:8px;border:1px solid rgba(255,255,255,0.03);padding:12px;font-family:monospace;resize:vertical}
+  .controls{display:flex;gap:8px;margin-bottom:8px}
+  button{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text);padding:8px 10px;border-radius:8px;cursor:pointer}
+  button.primary{background:linear-gradient(90deg,var(--accent),#6ef);border:none;color:#002}
+  iframe.preview{width:100%;height:320px;border-radius:8px;border:1px solid rgba(0,0,0,0.3);background:white}
+  .chat{flex:1;display:flex;flex-direction:column;gap:8px}
+  .messages{background:#08090a;padding:8px;border-radius:8px;height:320px;overflow:auto;border:1px solid rgba(255,255,255,0.02)}
+  .msg{padding:6px 8px;border-radius:6px;margin-bottom:6px}
+  .msg.you{background:linear-gradient(90deg,#1b8f6b22,#1b8f6b11);text-align:right}
+  .msg.bot{background:linear-gradient(90deg,#234a8f22,#11224411);text-align:left}
+  .chat-input{display:flex;gap:8px}
+  input[type="text"]{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)}
+  .dropzone{border:2px dashed rgba(255,255,255,0.03);padding:10px;border-radius:8px;text-align:center;color:rgba(255,255,255,0.35);cursor:pointer}
+  .small{font-size:13px;color:rgba(255,255,255,0.5)}
+  nav.preview-nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  nav.preview-nav button{padding:6px 10px;border-radius:6px;font-size:13px}
+  footer{padding:10px;text-align:center;color:rgba(255,255,255,0.35);font-size:12px}
+</style>
 </head>
 <body>
+<header>
+  <h1>آلف — SiteBuilder (TemplateOS + XML) — پیش‌نمایش</h1>
+</header>
 
-<header>پروژه آلف — نسخه MVP</header>
-
-<div class="window">
-    <div class="section-title">ساختار XML پروژه آلف</div>
-
-    <div class="xml">
-&lt;alf-project version="1.0"&gt;
-    &lt;meta&gt;
-        &lt;title&gt;پروژه آلف&lt;/title&gt;
-        &lt;author&gt;AREf999ms&lt;/author&gt;
-        &lt;status&gt;MVP&lt;/status&gt;
-    &lt;/meta&gt;
-
-    &lt;system name="TemplateOS"&gt;
-        &lt;module id="ui"&gt;
-            &lt;window size="full" theme="dark"&gt;
-                &lt;text&gt;به پروژه آلف خوش آمدید&lt;/text&gt;
-            &lt;/window&gt;
-        &lt;/module&gt;
-
-        &lt;module id="engine"&gt;
-            &lt;config&gt;
-                &lt;mode&gt;development&lt;/mode&gt;
-                &lt;version&gt;0.1-alpha&lt;/version&gt;
-            &lt;/config&gt;
-        &lt;/module&gt;
-    &lt;/system&gt;
-
-    &lt;pages&gt;
-        &lt;page id="home"&gt;
-            &lt;title&gt;صفحه اصلی&lt;/title&gt;
-            &lt;content&gt;
-                این نسخه اولیه (MVP) پروژه آلف است.
-            &lt;/content&gt;
-        &lt;/page&gt;
-
-        &lt;page id="about"&gt;
-            &lt;title&gt;درباره آلف&lt;/title&gt;
-            &lt;content&gt;
-                سیستم مبتنی بر TemplateOS + XML برای توسعه سریع.
-            &lt;/content&gt;
-        &lt;/page&gt;
-    &lt;/pages&gt;
-
-&lt;/alf-project&gt;
+<div class="wrap">
+  <div class="col left">
+    <div class="title">Editor — TemplateOS XML</div>
+    <div class="controls">
+      <button id="loadExample">بارگذاری مثال</button>
+      <button id="parseBtn" class="primary">پیش‌نمایش زنده</button>
     </div>
+    <textarea id="xmlEditor" class="xml" spellcheck="false"></textarea>
+    <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+      <div class="dropzone" id="dropzone">فایل یا تصویر را بکش و رها کن (برای شبیه‌سازی)</div>
+      <div class="small">مثال: &lt;page id="home"&gt; ...</div>
+    </div>
+  </div>
+
+  <div class="col mid">
+    <div class="title">پیش‌نمایش سایت</div>
+    <nav class="preview-nav" id="navButtons"></nav>
+    <iframe id="previewFrame" class="preview"></iframe>
+  </div>
+
+  <div class="col right">
+    <div class="title">روم چت (شبیه‌ساز)</div>
+    <div class="chat">
+      <div class="messages" id="messages"></div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+        <input id="chatInput" type="text" placeholder="پیام بنویس..." />
+        <button id="sendBtn" class="primary">ارسال</button>
+      </div>
+      <div style="margin-top:10px">
+        <div class="small">بات شبیه‌ساز: پاسخ‌ها محلی‌اند. برای ربات واقعی نیاز به سرور/توکن دارید.</div>
+      </div>
+    </div>
+
+    <div style="height:14px"></div>
+    <div class="title">ابزارها</div>
+    <button id="exportBtn">صدور XML (برای دانلود)</button>
+    <button id="copyHtml">کپی HTML پیش‌نمایش</button>
+  </div>
 </div>
 
+<footer>آلف — نسخهٔ اولیهٔ UI. (MVP) — عارف 18 ساله</footer>
+
+<script>
+// مثال اولیه XML
+const example = `<alf-project version="1.0">
+  <meta>
+    <title>آلف — فروشگاه نمونه</title>
+    <author>ARef999ms</author>
+  </meta>
+  <pages>
+    <page id="home"><title>خانه</title><content>به فروشگاه آزمایشی آلف خوش آمدید.</content></page>
+    <page id="catalog"><title>کاتالوگ</title><content>اینجا محصولات شما نمایش داده می‌شود.</content></page>
+    <page id="chat"><title>روم</title><content>چت عمومی آفلاین.</content></page>
+  </pages>
+</alf-project>`;
+
+// المان‌ها
+const xmlEditor = document.getElementById('xmlEditor');
+const parseBtn = document.getElementById('parseBtn');
+const loadExample = document.getElementById('loadExample');
+const previewFrame = document.getElementById('previewFrame');
+const navButtons = document.getElementById('navButtons');
+const messages = document.getElementById('messages');
+const chatInput = document.getElementById('chatInput');
+const sendBtn = document.getElementById('sendBtn');
+const exportBtn = document.getElementById('exportBtn');
+const copyHtml = document.getElementById('copyHtml');
+const dropzone = document.getElementById('dropzone');
+
+xmlEditor.value = example;
+
+// ساده‌ساز XML -> JS parser (خیلی ساده، برای MVP)
+function parseProject(xmlText){
+  try{
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xmlText,'application/xml');
+    if(doc.querySelector('parsererror')) return {error:true, msg:'XML نامعتبر'};
+    const proj = {};
+    const meta = doc.querySelector('meta');
+    proj.title = meta?.querySelector('title')?.textContent || 'بدون عنوان';
+    proj.author = meta?.querySelector('author')?.textContent || '';
+    proj.pages = [];
+    const pages = doc.querySelectorAll('pages page');
+    pages.forEach(p=>{
+      proj.pages.push({
+        id: p.getAttribute('id') || Math.random().toString(36).slice(2,7),
+        title: p.querySelector('title')?.textContent || 'بدون عنوان',
+        content: p.querySelector('content')?.textContent || ''
+      });
+    });
+    return proj;
+  }catch(e){
+    return {error:true, msg:e.message};
+  }
+}
+
+// ساخت HTML ساده از پروژه
+function buildPreviewHTML(proj){
+  const nav = proj.pages.map(p=>`<a class="link" href="#${p.id}" data-id="${p.id}">${p.title}</a>`).join(' | ');
+  const body = proj.pages.map(p=>`<section id="${p.id}" style="padding:18px"><h2>${p.title}</h2><div>${p.content}</div></section>`).join('');
+  return `<!doctype html><html lang="fa"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${proj.title}</title>
+  <style>body{font-family:Tahoma,Arial;padding:10px;background:#fff;color:#111}nav{background:#f3f3f3;padding:8px;border-radius:6px;margin-bottom:10px}section{border:1px solid #eee;padding:12px;border-radius:6px;margin-bottom:10px}</style>
+  </head><body><h1>${proj.title}</h1><nav>${nav}</nav>${body}</body></html>`;
+}
+
+// اعمال پیش‌نمایش
+function renderPreview(){
+  const xml = xmlEditor.value;
+  const proj = parseProject(xml);
+  if(proj.error){
+    previewFrame.srcdoc = `<pre style="color:red">${proj.msg}</pre>`;
+    return;
+  }
+  previewFrame.srcdoc = buildPreviewHTML(proj);
+  // ساخت دکمه‌های ناوبری
+  navButtons.innerHTML = '';
+  proj.pages.forEach(p=>{
+    const b = document.createElement('button');
+    b.textContent = p.title;
+    b.onclick = ()=> previewFrame.contentWindow.location.hash = '#'+p.id;
+    navButtons.appendChild(b);
+  });
+}
+
+parseBtn.addEventListener('click', renderPreview);
+loadExample.addEventListener('click', ()=>{ xmlEditor.value = example; renderPreview(); });
+
+// chat (شبیه‌ساز محلی)
+function pushMessage(text, who='you'){
+  const el = document.createElement('div');
+  el.className = 'msg ' + (who==='you'?'you':'bot');
+  el.textContent = text;
+  messages.appendChild(el);
+  messages.scrollTop = messages.scrollHeight;
+}
+sendBtn.addEventListener('click', ()=>{
+  const txt = chatInput.value.trim();
+  if(!txt) return;
+  pushMessage(txt,'you');
+  chatInput.value = '';
+  // پاسخ شبیه‌ساز ساده
+  setTimeout(()=> pushMessage('بات: پیام دریافت شد — (شبیه‌ساز پاسخ)', 'bot'), 700);
+});
+chatInput.addEventListener('keydown', e=>{ if(e.key==='Enter') sendBtn.click(); });
+
+// export xml
+exportBtn.addEventListener('click', ()=>{
+  const blob = new Blob([xmlEditor.value], {type:'application/xml'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'alf-project.xml'; a.click(); URL.revokeObjectURL(url);
+});
+
+// copy preview html
+copyHtml.addEventListener('click', ()=>{
+  navigator.clipboard.writeText(previewFrame.srcdoc || '').then(()=> alert('HTML پیش‌نمایش کپی شد'));
+});
+
+// dropzone برای شبیه‌سازی افزودن تصویر (تصویر را URL می‌کند در XML)
+dropzone.addEventListener('dragover', e=>{ e.preventDefault(); dropzone.style.borderColor = '#3bd0ff'; });
+dropzone.addEventListener('dragleave', e=>{ dropzone.style.borderColor = '' });
+dropzone.addEventListener('drop', e=>{
+  e.preventDefault(); dropzone.style.borderColor='';
+  const f = e.dataTransfer.files && e.dataTransfer.files[0];
+  if(!f){ alert('فایل یا عنصر قابل‌پشتیبانی نیست'); return; }
+  // شبیه‌سازی: فقط اضافه کردن یک تگ <asset> با نام فایل در XML
+  const name = f.name;
+  xmlEditor.value = xmlEditor.value.replace(/<\/alf-project>/,'  <assets><asset file="'+name+'"/></assets>\n</alf-project>');
+  alert('فایل شبیه‌سازی شد: ' + name);
+});
+
+// بارگذاری اولیه
+renderPreview();
+</script>
 </body>
 </html>
