@@ -1,543 +1,509 @@
-<!-- File: app2_real.html
-     ALF — App2 (واقعی، آفلاین، self-contained)
-     Save as app2_real.html and open in a browser.
--->
 <!doctype html>
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ALF — App2 (آفلاین واقعی)</title>
+<title>ALF — اتاق مزایده (Auction Room) — پلاگین</title>
 <style>
   :root{
-    --bg:#071026; --panel:#091a2a; --accent:#06b6d4; --muted:#9fd6e0; --card:#021026;
+    --bg:#071026; --panel:#0b2030; --accent:#f59e0b; --muted:#9fd6e0; --card:#021026;
+    --danger:#ef4444; --good:#10b981;
   }
-  html,body{height:100%;margin:0;font-family: "Segoe UI", Roboto, Arial, sans-serif;background: linear-gradient(180deg,#041025 0%, #071026 100%);color: #e6fbff;}
-  .app{display:flex;height:100vh;gap:10px;padding:12px;box-sizing:border-box;}
-  .left{flex:1; background:var(--panel); padding:14px;border-radius:12px; box-shadow: 0 8px 24px rgba(2,6,23,0.6); overflow:auto;}
-  .right{width:420px; background:linear-gradient(180deg,#071026,#051423); padding:14px;border-radius:12px; box-shadow: 0 8px 24px rgba(2,6,23,0.6); display:flex; flex-direction:column;}
-  header{display:flex;align-items:center;gap:12px}
+  html,body{height:100%;margin:0;font-family: "Vazirmatn", "Segoe UI", Roboto, Arial, sans-serif;background:linear-gradient(180deg,#041025,#071026);color:#e6fbff}
+  .wrap{display:flex;gap:12px;padding:14px;box-sizing:border-box;height:100vh}
+  .left{flex:1;background:var(--panel);padding:12px;border-radius:12px;overflow:auto;box-shadow:0 12px 30px rgba(0,0,0,0.6)}
+  .right{width:420px;background:linear-gradient(180deg,#081a2a,#041423);padding:12px;border-radius:12px;display:flex;flex-direction:column;box-shadow:0 12px 30px rgba(0,0,0,0.6)}
+  header{display:flex;align-items:center;gap:10px}
   h1{margin:0;font-size:20px}
-  .controls{margin-left:auto;display:flex;gap:8px;align-items:center}
-  .btn{background:var(--accent);color:#022029;padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
+  .controls{margin-left:auto;display:flex;gap:8px}
+  .btn{background:var(--accent);color:#082022;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
   .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:8px;color:var(--muted);cursor:pointer}
-  .section{margin-top:14px}
-  .card{background:var(--card);padding:12px;border-radius:10px;margin-bottom:10px}
-  .product{display:flex;gap:12px;align-items:center;padding:10px;background:rgba(255,255,255,0.02);border-radius:10px;margin-bottom:8px}
-  .product img{width:86px;height:86px;object-fit:cover;border-radius:8px}
-  .meta{flex:1}
-  .price{font-weight:700;color:var(--accent)}
-  .small{font-size:13px;opacity:0.85}
-  /* Right / Plugin (Room) */
-  .room-header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.03)}
-  .chat{flex:1; display:flex; flex-direction:column; gap:8px; padding:10px 0; overflow:auto}
-  .msg{background:rgba(255,255,255,0.02);padding:8px;border-radius:8px;max-width:92%;}
-  .msg.admin{background:linear-gradient(90deg,#063246,#083b50); color:#dff6ff; font-weight:600}
-  .msg.me{background:linear-gradient(90deg,#0b3a3a,#0f5353); color:#fff; margin-left:auto}
-  .msg.bot{background:rgba(255,255,255,0.01);font-style:italic;opacity:0.95}
-  .chat-controls{display:flex;gap:8px;padding-top:8px}
-  input[type="text"]{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
-  /* token badge */
-  .badge{background:#052b33;color:#9ff;border-radius:8px;padding:6px 8px;font-weight:700}
+  .card{background:var(--card);padding:12px;border-radius:10px;margin-top:12px}
+  .small{font-size:13px;opacity:0.9}
+  /* Auction info */
+  .auction-top{display:flex;gap:12px;align-items:center}
+  .price-big{font-size:28px;font-weight:800;color:var(--accent)}
+  .timer-badge{background:#021026;padding:8px 12px;border-radius:10px;font-weight:700}
+  /* bids list */
+  .bids{margin-top:10px;max-height:320px;overflow:auto;padding-right:6px}
+  .bid-item{display:flex;justify-content:space-between;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:8px}
+  .bid-item .meta{opacity:0.95}
+  .bid-high{border:2px solid rgba(245,158,11,0.18)}
+  /* participants */
+  .participants{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .participant{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02)}
+  .input-row{display:flex;gap:8px;margin-top:10px}
+  input[type="text"], input[type="number"]{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;flex:1}
+  .tiny{font-size:12px;color:var(--muted)}
+  footer{margin-top:10px;font-size:12px;color:var(--muted)}
   /* modal */
-  .modal-back{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:60}
-  .modal{background:linear-gradient(180deg,#0b2240,#061427);padding:18px;border-radius:12px;width:min(720px,92%);color:#e6fbff}
+  .modal-back{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:80}
+  .modal{background:linear-gradient(180deg,#0b2240,#061427);padding:18px;border-radius:12px;width:min(760px,96%);color:#e6fbff}
   label{display:block;margin-bottom:6px;font-size:13px;color:var(--muted)}
-  .form-row{margin-bottom:10px}
-  .tiny{font-size:12px;opacity:0.8}
-  footer{font-size:12px;color:var(--muted);opacity:0.9;margin-top:8px}
-  /* responsive */
-  @media (max-width:900px){ .right{width:360px} .app{flex-direction:column} }
+  .ok{background:var(--good);color:#052; padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+  .danger{background:var(--danger);color:white;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+  @media (max-width:900px){ .wrap{flex-direction:column} .right{width:100%} }
 </style>
 </head>
 <body>
-<div class="app" role="application" aria-label="ALF App2">
-  <div class="left" id="catalog">
+<div class="wrap" role="application" aria-label="ALF Auction Room">
+  <div class="left" id="mainLeft">
     <header>
-      <h1>آلف — کاتالوگ</h1>
-      <div class="controls" id="leftControls">
-        <div class="badge" id="tokenBadge" title="توکن دانلود/دعوت">—</div>
-        <button class="btn" id="createTokenBtn">ساخت توکن</button>
-        <button class="ghost" id="downloadHtmlBtn" title="دانلود نسخهٔ مستقل کاتالوگ">دانلود مستقل</button>
+      <h1>اتاق مزایده — ALF</h1>
+      <div class="controls" id="mainControls">
+        <div class="tiny" id="tokenText">توکن: <strong id="tokenVal">—</strong></div>
+        <button class="ghost" id="genTokenBtn">ساخت توکن</button>
+        <button class="ghost" id="downloadLogBtn">دانلود لاگ</button>
+        <button class="ghost" id="exportCsvBtn">صدور CSV</button>
       </div>
     </header>
 
-    <div class="section card" id="adminPanel" style="display:none">
-      <div style="display:flex;align-items:center;gap:10px">
-        <strong>پنل ادمین</strong>
-        <div style="margin-left:auto" class="small">وضعیت: <span id="adminStatus">ادمین</span></div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div class="small">محصول در مزایده</div>
+          <div class="price-big" id="itemTitle">ساعت لوکس — مدل ویژه</div>
+          <div class="tiny">شناسه محصول: <span id="itemId">P-001</span></div>
+        </div>
+        <div style="text-align:left">
+          <div class="small">وضعیت مزایده</div>
+          <div class="timer-badge" id="timerDisplay">--:--:--</div>
+        </div>
       </div>
-      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-        <button class="btn" id="openRoomBtn">باز کردن روم در پنجرهٔ جدا</button>
-        <button class="ghost" id="startAuctionBtn">شروع حراج (10 دقیقه)</button>
-        <button class="ghost" id="stopAuctionBtn">متوقف کردن حراج</button>
-        <button class="ghost" id="toggleUserChatBtn">فقط ادمین پیغام بفرست / همه</button>
-      </div>
-      <div style="margin-top:10px" class="small">PIN ادمین: <span id="adminPinDisplay">****</span></div>
-    </div>
 
-    <div class="section">
-      <h3 style="margin-bottom:6px">محصولات</h3>
-      <div id="productsList">
-        <!-- dynamically populated -->
+      <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
+        <div>
+          <div class="small">قیمت فعلی (آخرین پیشنهاد)</div>
+          <div class="price-big" id="currentPrice">—</div>
+        </div>
+        <div style="margin-left:auto">
+          <div class="small">حداقل افزایش</div>
+          <div class="tiny" id="minIncrDisplay">—</div>
+        </div>
       </div>
-    </div>
 
-    <div class="section card">
-      <h3 style="margin:0 0 8px 0">افزودن محصول (نمایشی)</h3>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input id="pTitle" placeholder="نام محصول" style="padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
-        <input id="pPrice" placeholder="قیمت" style="width:120px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
-        <button class="btn" id="addProductBtn">افزودن</button>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="text" id="bidderName" placeholder="نام شرکت‌کننده (نمایشی)">
+          <input type="number" id="bidAmount" placeholder="مبلغ پیشنهادی (عدد)" min="1">
+          <button class="btn" id="placeBidBtn">ثبت پیشنهاد</button>
+        </div>
+        <div class="tiny" style="margin-top:8px">پیشنهادها به‌صورت محلی ذخیره می‌شوند و برای نمایش/آزمایش هستند.</div>
       </div>
-      <div class="tiny" style="margin-top:8px;color:var(--muted)">افزودن فقط محلی است و در localStorage ذخیره می‌شود.</div>
-    </div>
 
-    <div class="section small card">
-      <strong>توضیحات:</strong>
-      <p class="tiny">این نسخه آفلاین است. روم به‌صورت پنجرهٔ جدا (مثل پلاگین) باز می‌شود و بات به‌صورت محلی زمان‌بندی را مدیریت می‌کند.</p>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong>فهرست پیشنهادها</strong>
+          <div class="small">مجموع: <span id="bidsCount">0</span></div>
+        </div>
+        <div class="bids" id="bidsList" aria-live="polite">
+          <!-- bids appended here -->
+        </div>
+      </div>
+
+      <div class="card">
+        <strong>لاگ سیستم</strong>
+        <div id="systemLog" style="max-height:160px;overflow:auto;margin-top:8px;padding:8px;background:rgba(255,255,255,0.02);border-radius:8px;font-size:13px"></div>
+      </div>
+
     </div>
   </div>
 
-  <div class="right" id="roomWrap" aria-live="polite">
-    <div class="room-header">
+  <aside class="right" id="mainRight">
+    <div style="display:flex;justify-content:space-between;align-items:center">
       <div>
-        <strong>روم (پلاگین)</strong><div class="tiny" id="roomState">وضعیت: آماده</div>
+        <strong>کنترل ادمین</strong>
+        <div class="tiny">ورود با PIN</div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button class="ghost" id="togglePinBtn" title="ورود ادمین">ورود ادمین</button>
-        <button class="btn" id="openWindowBtn" title="باز کردن روم در پنجرهٔ جدا">پنجرۀ جدا</button>
+      <div style="display:flex;gap:8px">
+        <button class="ghost" id="adminPinBtn">ورود ادمین</button>
+        <button class="btn" id="openWindowBtn">پنجرهٔ جدا (پلاگین)</button>
       </div>
     </div>
 
-    <div class="chat" id="chatArea" role="log" aria-relevant="additions">
-      <!-- messages -->
+    <div class="card" style="margin-top:12px">
+      <div class="small">تنظیمات مزایده</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input type="number" id="startPrice" placeholder="قیمت شروع" value="1000">
+        <input type="number" id="minIncrement" placeholder="حداقل افزایش" value="100">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn" id="startAuctionBtn">شروع حراج (پیش‌نمایش)</button>
+        <button class="ghost" id="stopAuctionBtn">توقف</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="ghost" id="lockChatBtn">قفل چت (فقط ادمین)</button>
+        <button class="ghost" id="unlockChatBtn">باز کردن چت</button>
+      </div>
+      <div style="margin-top:10px" class="tiny">توضیح: در حالت قفل، فقط ادمین می‌تواند پیشنهاد بفرستد.</div>
     </div>
 
-    <div class="chat-controls">
-      <input type="text" id="chatInput" placeholder="پیام..." aria-label="متن پیام" />
-      <button class="btn" id="sendBtn">ارسال</button>
+    <div class="card" style="margin-top:12px">
+      <strong>شرکت‌کننده‌ها</strong>
+      <div class="participants" id="participantsList">
+        <!-- participants -->
+      </div>
+      <div style="margin-top:8px">
+        <input type="text" id="newParticipantName" placeholder="افزودن شرکت‌کننده (مثال: ali)">
+        <button class="btn" id="addParticipantBtn">افزودن</button>
+      </div>
     </div>
 
-    <div style="margin-top:8px;display:flex;gap:8px;align-items:center;justify-content:space-between">
-      <div class="tiny" id="timerDisplay">تایمر: --:--:--</div>
-      <div class="tiny">دسترسی چت: <span id="chatAccess">فقط ادمین</span></div>
-    </div>
-  </div>
+    <footer>
+      <div class="tiny">نسخهٔ آفلاین و نمایشی — هیچ دسترسی به دوربین یا شبکه اجرا نمی‌شود.</div>
+    </footer>
+  </aside>
 </div>
 
-<!-- modal for PIN -->
+<!-- modal root -->
 <div id="modalRoot" style="display:none"></div>
 
 <script>
-/* ========= Client-side App2 logic (offline) =========
- - Uses localStorage to persist products, messages, admin PIN and instances.
- - Admin PIN default: "1234" (you can change via localStorage or modify code).
- - Ability to open a detached room window (window.open) and sync via postMessage.
- - Auction bot: when auction started, bot posts timer ticks and at end opens chat for users.
- - Token generation: pseudo-random token saved locally.
+/* Auction Room — Offline Single-file Implementation
+   - localStorage keys: auction_state_v1, auction_bids_v1, auction_log_v1, auction_participants_v1, auction_settings_v1
+   - admin PIN default: 1234 (changeable via console/localStorage)
+   - open window plugin via data: URL and postMessage sync
 */
 
-// Utility
-const $ = (q,root=document) => root.querySelector(q);
-const tokenKey = 'alf_token_v1';
-const productsKey = 'alf_products_v1';
-const messagesKey = 'alf_messages_v1';
-const settingsKey = 'alf_settings_v1';
-const adminPinDefault = '1234';
+// keys
+const STATE_KEY = 'auction_state_v1';
+const BIDS_KEY = 'auction_bids_v1';
+const LOG_KEY = 'auction_log_v1';
+const PART_KEY = 'auction_participants_v1';
+const SETT_KEY = 'auction_settings_v1';
+const TOKEN_KEY = 'auction_token_v1';
 
-// State
+// default settings
+const defaultSettings = { adminPin: '1234', minIncrement: 100, startPrice: 1000 };
+
+// in-memory state
 let state = {
   isAdmin: false,
-  adminPin: localStorage.getItem(settingsKey) ? JSON.parse(localStorage.getItem(settingsKey)).adminPin || adminPinDefault : adminPinDefault,
-  token: localStorage.getItem(tokenKey) || null,
-  chatWindow: null,
-  auctionTimer: null,
-  auctionEndsAt: null,
-  allowUserChat: false
+  running: false,
+  endsAt: null,
+  timerInterval: null,
+  childWindow: null,
+  allowUserBids: false
 };
 
-// Init
+// helpers
+const $ = (s,root=document)=>root.querySelector(s);
+const now = ()=>Date.now();
+function logSystem(msg){ const el = $('#systemLog'); const p = document.createElement('div'); p.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`; el.prepend(p); saveLog(msg); }
+
+// storage helpers
+function saveSettings(s){ localStorage.setItem(SETT_KEY, JSON.stringify(s)); }
+function loadSettings(){ const s = JSON.parse(localStorage.getItem(SETT_KEY) || 'null'); if(!s){ saveSettings(defaultSettings); return defaultSettings; } return s; }
+function saveBids(arr){ localStorage.setItem(BIDS_KEY, JSON.stringify(arr)); }
+function loadBids(){ return JSON.parse(localStorage.getItem(BIDS_KEY) || '[]'); }
+function saveLogEntry(entry){ const arr = JSON.parse(localStorage.getItem(LOG_KEY) || '[]'); arr.unshift(entry); localStorage.setItem(LOG_KEY, JSON.stringify(arr)); }
+function saveLog(msg){ saveLogEntry({ts: now(), text: msg}); }
+function saveParticipants(arr){ localStorage.setItem(PART_KEY, JSON.stringify(arr)); }
+function loadParticipants(){ return JSON.parse(localStorage.getItem(PART_KEY) || '[]'); }
+function saveState(s){ localStorage.setItem(STATE_KEY, JSON.stringify(s)); }
+function loadState(){ return JSON.parse(localStorage.getItem(STATE_KEY) || 'null'); }
+
+// init
 function init(){
-  if(!localStorage.getItem(productsKey)){
-    const sample = [
-      {id: 'p1', title: 'ساعت لوکس', price: '12000', img: null},
-      {id: 'p2', title: 'عینک نادر', price: '4000', img: null}
-    ];
-    localStorage.setItem(productsKey, JSON.stringify(sample));
-  }
-  if(!localStorage.getItem(messagesKey)) localStorage.setItem(messagesKey, JSON.stringify([]));
-  if(!localStorage.getItem(settingsKey)) localStorage.setItem(settingsKey, JSON.stringify({adminPin:adminPinDefault}));
-  state.adminPin = JSON.parse(localStorage.getItem(settingsKey)).adminPin || adminPinDefault;
-  state.token = localStorage.getItem(tokenKey) || null;
-
-  renderProducts();
-  renderMessages();
-  updateTokenBadge();
-  updateAdminPanel();
-  updateTimerDisplay();
+  const settings = loadSettings();
+  $('#minIncrDisplay').textContent = settings.minIncrement;
+  $('#startPrice').value = settings.startPrice;
+  $('#minIncrement').value = settings.minIncrement;
+  $('#currentPrice').textContent = '—';
+  $('#bidsCount').textContent = loadBids().length;
+  $('#tokenVal').textContent = localStorage.getItem(TOKEN_KEY) || 'ندارد';
+  renderParticipants();
+  renderBids();
+  renderLog();
   bindUI();
-  // Listen for postMessage from child windows
-  window.addEventListener('message', receiveMessageFromChild);
+  // try to restore running auction
+  const st = loadState();
+  if(st && st.running && st.endsAt){ state.running = true; state.endsAt = st.endsAt; tickTimer(); state.timerInterval = setInterval(tickTimer, 1000); updateUIRunning(); }
 }
 
-// UI rendering
-function renderProducts(){
-  const list = JSON.parse(localStorage.getItem(productsKey) || '[]');
-  const container = $('#productsList');
-  container.innerHTML = '';
-  for(const p of list){
-    const el = document.createElement('div');
-    el.className = 'product';
-    el.innerHTML = `<div style="width:86px;height:86px;background:linear-gradient(180deg,#0b2a3a,#042428);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted)">${p.img ? `<img src="${p.img}" alt="${escapeHtml(p.title)}">` : '<div style="padding:6px;text-align:center">تصویر</div>'}</div>
-      <div class="meta"><div style="font-weight:700">${escapeHtml(p.title)}</div><div class="small">توضیحات کوتاه</div></div>
-      <div style="text-align:left"><div class="price">$${escapeHtml(p.price)}</div><div style="margin-top:8px"><button class="btn" onclick="startPrivateChat('${p.id}')">شروع چت</button></div></div>`;
-    container.appendChild(el);
-  }
-}
-
-function renderMessages(){
-  const msgs = JSON.parse(localStorage.getItem(messagesKey) || '[]');
-  const area = $('#chatArea');
-  area.innerHTML = '';
-  for(const m of msgs){
-    const d = document.createElement('div');
-    d.className = 'msg ' + (m.role==='admin'?'admin': m.role==='bot' ? 'bot' : (m.me? 'me':'' ));
-    d.textContent = `${m.sender ? '['+m.sender+'] ' : ''}${m.text}`;
-    area.appendChild(d);
-  }
-  area.scrollTop = area.scrollHeight;
-}
-
-// Helpers
-function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"})[c];}); }
-
-// Events & actions
+// UI bind
 function bindUI(){
-  $('#addProductBtn').addEventListener('click', ()=>{
-    const t = $('#pTitle').value.trim(); const pr = $('#pPrice').value.trim();
-    if(!t || !pr){ alert('عنوان و قیمت را وارد کن'); return; }
-    const list = JSON.parse(localStorage.getItem(productsKey));
-    const id = 'p' + Date.now();
-    list.push({id, title:t, price:pr, img:null});
-    localStorage.setItem(productsKey, JSON.stringify(list));
-    $('#pTitle').value=''; $('#pPrice').value='';
-    renderProducts();
-  });
-
-  $('#createTokenBtn').addEventListener('click', ()=>{
-    const tok = generateToken();
-    state.token = tok;
-    localStorage.setItem(tokenKey, tok);
-    updateTokenBadge();
-    alert('توکن ساخته شد:\n' + tok + '\nاین توکن را برای دعوت/دانلود می‌توان استفاده کرد (نمایشی).');
-  });
-
-  $('#downloadHtmlBtn').addEventListener('click', downloadStandaloneCatalog);
-
-  $('#openWindowBtn').addEventListener('click', ()=> openRoomWindow());
-  $('#openRoomBtn')?.addEventListener('click', ()=> openRoomWindow());
-
-  $('#sendBtn').addEventListener('click', sendChatFromInput);
-  $('#chatInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') sendChatFromInput(); });
-
-  $('#togglePinBtn').addEventListener('click', showPinModal);
-  $('#toggleUserChatBtn')?.addEventListener('click', toggleUserChatAccess);
-  $('#startAuctionBtn')?.addEventListener('click', ()=> startAuction(10*60)); // 10 minutes
-  $('#stopAuctionBtn')?.addEventListener('click', stopAuction);
+  $('#placeBidBtn').addEventListener('click', placeBid);
+  $('#genTokenBtn').addEventListener('click', genToken);
+  $('#downloadLogBtn').addEventListener('click', downloadLog);
+  $('#exportCsvBtn').addEventListener('click', exportCsv);
+  $('#addParticipantBtn').addEventListener('click', addParticipant);
+  $('#startAuctionBtn').addEventListener('click', ()=> startAuctionFromInputs());
+  $('#stopAuctionBtn').addEventListener('click', stopAuction);
+  $('#lockChatBtn').addEventListener('click', ()=> setChatLock(true));
+  $('#unlockChatBtn').addEventListener('click', ()=> setChatLock(false));
+  $('#adminPinBtn').addEventListener('click', showAdminModal);
+  $('#openWindowBtn').addEventListener('click', openChildWindow);
 }
 
-function generateToken(){
-  const a = Math.random().toString(36).slice(2,10).toUpperCase();
-  const b = Math.random().toString(36).slice(2,8).toUpperCase();
-  return a+'-'+b;
+// token
+function genToken(){
+  const t = Math.random().toString(36).slice(2,10).toUpperCase() + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
+  localStorage.setItem(TOKEN_KEY, t);
+  $('#tokenVal').textContent = t;
+  logSystem('توکن ساخته شد: ' + t);
+  alert('توکن ساخته شد: ' + t + '\n(نمایشی و محلی)');
 }
 
-function updateTokenBadge(){
-  $('#tokenBadge').textContent = state.token || 'ندارد';
+// participants
+function addParticipant(){
+  const name = $('#newParticipantName').value.trim();
+  if(!name){ alert('نام وارد نشده'); return; }
+  const arr = loadParticipants();
+  arr.push({name, joined: now()});
+  saveParticipants(arr);
+  $('#newParticipantName').value='';
+  renderParticipants();
+  logSystem('شرکت‌کننده افزوده شد: ' + name);
 }
-
-// Chat send
-function sendChatFromInput(){
-  const txt = $('#chatInput').value.trim();
-  if(!txt) return;
-  if(!state.isAdmin && !state.allowUserChat){
-    alert('فعلا فقط ادمین می‌تواند پیام ارسال کند.');
-    return;
-  }
-  postMessageLocal({sender: state.isAdmin ? 'ادمین' : 'کاربر', text: txt, role: state.isAdmin ? 'admin' : 'user', me: !state.isAdmin});
-  $('#chatInput').value='';
-}
-
-function postMessageLocal(msg){
-  const arr = JSON.parse(localStorage.getItem(messagesKey) || '[]');
-  arr.push({...msg, ts: Date.now()});
-  localStorage.setItem(messagesKey, JSON.stringify(arr));
-  renderMessages();
-  // propagate to child windows if open
-  if(state.chatWindow && !state.chatWindow.closed){
-    try{ state.chatWindow.postMessage({type:'new_message', payload:msg}, '*'); } catch(e){}
+function renderParticipants(){
+  const arr = loadParticipants();
+  const wrap = $('#participantsList'); wrap.innerHTML='';
+  for(const p of arr){
+    const div = document.createElement('div'); div.className='participant'; div.innerHTML = `<div>${escapeHtml(p.name)}</div><div class="tiny">joined</div>`;
+    wrap.appendChild(div);
   }
 }
 
-// Admin / PIN modal
-function showPinModal(){
-  const root = $('#modalRoot');
-  root.innerHTML = `<div class="modal-back"><div class="modal">
-    <h3>ورود ادمین</h3>
-    <div class="form-row"><label>PIN ادمین</label><input id="pinInput" type="text" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end"><button class="ghost" id="cancelPin">انصراف</button><button class="btn" id="confirmPin">ورود</button></div>
-    <div class="tiny" style="margin-top:10px;color:var(--muted)">PIN اولیه: <strong>${state.adminPin}</strong> (قابل تغییر از localStorage)</div>
-  </div></div>`;
-  root.style.display='block';
-  $('#cancelPin').addEventListener('click', ()=>{ root.style.display='none'; root.innerHTML=''; });
-  $('#confirmPin').addEventListener('click', ()=>{
-    const v = $('#pinInput').value.trim();
-    if(v === state.adminPin){
-      state.isAdmin = true;
-      localStorage.setItem(settingsKey, JSON.stringify({adminPin: state.adminPin}));
-      root.style.display='none'; root.innerHTML='';
-      updateAdminPanel();
-      postMessageLocal({sender:'سیستم', text:'ادمین وارد شد', role:'bot'});
+// bids
+function placeBid(){
+  const name = $('#bidderName').value.trim() || 'ناشناس';
+  let amount = Number($('#bidAmount').value);
+  if(isNaN(amount) || amount <= 0){ alert('مبلغ معتبر وارد کن'); return; }
+  // check permissions
+  if(!state.isAdmin && !state.allowUserBids){ alert('فعلا فقط ادمین می‌تواند پیشنهاد بده'); return; }
+  const bids = loadBids();
+  const current = bids.length ? bids[bids.length-1].amount : Number($('#startPrice').value) - Number($('#minIncrement').value);
+  const minInc = Number($('#minIncrement').value) || loadSettings().minIncrement;
+  if(amount < current + minInc){ alert(`حداقل باید ${current + minInc} یا بیشتر باشد (حداقل افزایش ${minInc}).`); return; }
+  const bid = {id: 'b' + Date.now(), bidder: name, amount, ts: now()};
+  bids.push(bid); saveBids(bids);
+  renderBids();
+  $('#bidAmount').value='';
+  $('#bidderName').value='';
+  logSystem(`پیشنهاد ثبت شد: ${name} — ${amount}`);
+  // broadcast to child window
+  syncChildWindow();
+}
+function renderBids(){
+  const bids = loadBids();
+  const wrap = $('#bidsList'); wrap.innerHTML='';
+  for(let i=0;i<bids.length;i++){
+    const b = bids[i];
+    const el = document.createElement('div');
+    el.className = 'bid-item' + (i===bids.length-1 ? ' bid-high' : '');
+    el.innerHTML = `<div class="meta"><strong>${escapeHtml(b.bidder)}</strong><div class="tiny">${new Date(b.ts).toLocaleString()}</div></div><div style="text-align:left"><div style="font-weight:800">${b.amount}</div></div>`;
+    wrap.appendChild(el);
+  }
+  $('#bidsCount').textContent = bids.length;
+  $('#currentPrice').textContent = bids.length ? bids[bids.length-1].amount : '—';
+}
+
+// log
+function renderLog(){
+  const arr = JSON.parse(localStorage.getItem(LOG_KEY) || '[]');
+  const el = $('#systemLog'); el.innerHTML='';
+  for(const item of arr.slice(0,200)){
+    const p = document.createElement('div');
+    p.textContent = `${new Date(item.ts).toLocaleTimeString()} — ${item.text}`;
+    el.appendChild(p);
+  }
+}
+
+// admin
+function showAdminModal(){
+  const root = $('#modalRoot'); root.innerHTML = `<div class="modal-back"><div class="modal"><h3>ورود ادمین</h3><label>PIN</label><input id="modalPin" type="text" style="width:100%;padding:8px;border-radius:8px;background:transparent;color:inherit;border:1px solid rgba(255,255,255,0.04)"><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="ghost" id="modalCancel">انصراف</button><button class="ok" id="modalOk">ورود</button></div></div></div>`; root.style.display='block';
+  $('#modalCancel').onclick = ()=>{ root.style.display='none'; root.innerHTML=''; };
+  $('#modalOk').onclick = ()=>{
+    const pin = $('#modalPin').value.trim();
+    const settings = loadSettings();
+    if(pin === settings.adminPin){
+      state.isAdmin = true; root.style.display='none'; root.innerHTML=''; logSystem('ادمین وارد شد'); alert('ورود ادمین موفق');
+      applyAdminUI();
     } else {
-      alert('PIN اشتباه است.');
+      alert('PIN اشتباه است');
     }
-  });
-}
-
-// Admin UI toggle
-function updateAdminPanel(){
-  const panel = $('#adminPanel');
-  if(state.isAdmin){ panel.style.display='block'; $('#adminPinDisplay').textContent = '******'; $('#adminStatus').textContent='ادمین'; $('#togglePinBtn').textContent='خروج ادمین'; }
-  else { panel.style.display='none'; $('#adminStatus').textContent='مخاطب'; $('#togglePinBtn').textContent='ورود ادمین'; }
-  // togglePinBtn behaviour to logout as well
-  $('#togglePinBtn').onclick = ()=> {
-    if(state.isAdmin){ state.isAdmin=false; updateAdminPanel(); postMessageLocal({sender:'سیستم', text:'ادمین خارج شد', role:'bot'}); }
-    else showPinModal();
   };
 }
-
-// Room window handling
-function openRoomWindow(){
-  // open a minimal window showing room.html content - we'll generate inline content via data URL to keep offline single-file
-  const features = 'width=420,height=360,menubar=no,toolbar=no,location=no,status=no';
-  // Build a small HTML to open in child window, with messaging bridge
-  const childHtml = buildChildWindowHtml();
-  const url = 'data:text/html;charset=utf-8,' + encodeURIComponent(childHtml);
-  const w = window.open(url, '_blank', features);
-  state.chatWindow = w;
+function applyAdminUI(){
+  // show admin functions visually by highlighting
+  $('#startAuctionBtn').classList.add('btn');
+  $('#lockChatBtn').classList.remove('ghost');
 }
 
-// child window html builder
-function buildChildWindowHtml(){
-  // We'll include a small script that posts messages to opener and listens for new_message events
-  const msgs = JSON.parse(localStorage.getItem(messagesKey) || '[]');
-  const token = state.token || '';
-  const allow = state.allowUserChat;
-  return `
-<!doctype html>
-<html lang="fa" dir="rtl">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ALF — روم جدا</title>
-<style>
-  body{font-family:sans-serif;background:#071026;color:#e6fbff;margin:0;padding:0}
-  header{background:#0b2333;padding:8px;text-align:center;font-weight:700}
-  .wrap{padding:10px}
-  .chat{height:260px;overflow:auto;background:#021026;padding:10px;border-radius:8px}
-  .msg{background:rgba(255,255,255,0.02);padding:8px;border-radius:8px;margin:6px 0}
-  .controls{display:flex;gap:8px;margin-top:8px}
-  input{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
-  button{background:#06b6d4;color:#022;padding:8px 12px;border-radius:8px;border:none}
-  .tiny{font-size:12px;opacity:0.9;margin-top:8px}
-</style>
-</head>
-<body>
-<header>روم — پنجرهٔ جدا (ALF)</header>
-<div class="wrap">
-  <div class="tiny">توکن: <strong>${token}</strong></div>
-  <div class="chat" id="msgs"></div>
-  <div class="controls">
-    <input id="inp" placeholder="${allow ? 'پیام...' : 'فعلاً فقط ادمین می‌تواند پیام بفرستد'}" ${allow? '': 'disabled'}>
-    <button id="send" ${allow? '': 'disabled'}>ارسال</button>
-  </div>
-  <div class="tiny">این پنجره با پنجرهٔ مادر همگام می‌شود.</div>
-</div>
-<script>
-  // populate messages from opener snapshot
-  const initial = ${JSON.stringify(msgs)};
-  const area = document.getElementById('msgs');
-  function renderMsgs(arr){
-    area.innerHTML='';
-    for(const m of arr){
-      const d = document.createElement('div');
-      d.className='msg';
-      d.textContent = (m.sender? '['+m.sender+'] ':'') + m.text;
-      area.appendChild(d);
-    }
-    area.scrollTop = area.scrollHeight;
-  }
-  renderMsgs(initial);
-
-  // send to opener
-  document.getElementById('send').addEventListener('click', ()=>{
-    const val = document.getElementById('inp').value.trim();
-    if(!val) return;
-    // post to opener
-    if(window.opener) window.opener.postMessage({type:'child_send', payload: {text: val}}, '*');
-    document.getElementById('inp').value='';
-  });
-
-  // receive new messages from opener
-  window.addEventListener('message', (ev)=>{
-    try{
-      const d = ev.data;
-      if(d && d.type === 'new_message'){
-        initial.push(d.payload);
-        renderMsgs(initial);
-      } else if(d && d.type === 'sync_all'){
-        // replace
-        initial.length=0; Array.prototype.push.apply(initial, d.payload);
-        renderMsgs(initial);
-      }
-    }catch(e){}
-  }, false);
-
-  // try to notify opener that we're ready
-  if(window.opener) window.opener.postMessage({type:'child_ready'}, '*');
-</script>
-</body>
-</html>
-  `;
+// auction timer
+function startAuctionFromInputs(){
+  if(!state.isAdmin){ alert('فقط ادمین می‌تواند حراج را شروع کند'); return; }
+  const startPrice = Number($('#startPrice').value) || loadSettings().startPrice;
+  const minInc = Number($('#minIncrement').value) || loadSettings().minIncrement;
+  // reset bids
+  saveBids([]);
+  renderBids();
+  $('#currentPrice').textContent = startPrice;
+  $('#minIncrDisplay').textContent = minInc;
+  // set allowUserBids false initially
+  state.allowUserBids = false;
+  // set duration prompt
+  let mins = prompt('مدت زمان حراج (دقیقه):', '10');
+  mins = Number(mins);
+  if(isNaN(mins) || mins <= 0){ alert('مدت زمان نامعتبر'); return; }
+  const durMs = mins * 60 * 1000;
+  state.endsAt = now() + durMs;
+  state.running = true;
+  if(state.timerInterval) clearInterval(state.timerInterval);
+  state.timerInterval = setInterval(tickTimer, 1000);
+  saveState({running: true, endsAt: state.endsAt});
+  logSystem(`حراج شروع شد — مدت ${mins} دقیقه — قیمت شروع ${startPrice}`);
+  postBotMessage('حراج شروع شد. لطفا پیشنهادها را ثبت کنید.');
+  syncChildWindow();
+  updateUIRunning();
 }
 
-// receive messages from child window
-function receiveMessageFromChild(ev){
-  const d = ev.data;
-  if(!d) return;
-  if(d.type === 'child_send' && d.payload){
-    // child requested to send a message (user typed in child window)
-    // treat as user message and post locally (subject to permissions)
-    if(!state.allowUserChat && !state.isAdmin){
-      alert('در پنجرهٔ جدا کاربر اجازهٔ ارسال ندارد.');
-      return;
-    }
-    postMessageLocal({sender:'بازدیدکننده', text: d.payload.text, role:'user', me:false});
-  } else if(d.type === 'child_ready'){
-    // child ready -> send full sync
-    const msgs = JSON.parse(localStorage.getItem(messagesKey) || '[]');
-    try{ ev.source.postMessage({type:'sync_all', payload: msgs}, '*'); } catch(e){}
+function tickTimer(){
+  if(!state.running || !state.endsAt){ $('#timerDisplay').textContent='--:--:--'; return; }
+  const left = Math.max(0, Math.floor((state.endsAt - now())/1000));
+  const hh = String(Math.floor(left/3600)).padStart(2,'0');
+  const mm = String(Math.floor((left%3600)/60)).padStart(2,'0');
+  const ss = String(left%60).padStart(2,'0');
+  $('#timerDisplay').textContent = `${hh}:${mm}:${ss}`;
+  if(left <= 0){
+    finishAuction();
   }
 }
 
-// private chat from product (simulated)
-function startPrivateChat(productId){
-  // show a quick message from admin (demo)
-  postMessageLocal({sender:'ادمین', text:'درخواست بررسی محصول '+productId+' ثبت شد. لطفا آماده باشید.', role:'admin'});
-  alert('درخواست چت خصوصی (نمایشی) برای ' + productId + ' ارسال شد.');
-}
-
-// Auction bot
-function startAuction(durationSeconds){
-  stopAuction(); // clear existing
-  const now = Date.now();
-  state.auctionEndsAt = now + durationSeconds*1000;
-  // schedule interval tick every second
-  state.auctionTimer = setInterval(()=>{
-    const left = Math.max(0, Math.floor((state.auctionEndsAt - Date.now())/1000));
-    updateTimerDisplay(left);
-    if(left % 10 === 0){ // every 10s, bot message to update
-      const mm = formatSeconds(left);
-      postMessageLocal({sender:'بات', text: `حراج: زمان باقی‌مانده ${mm}`, role:'bot'});
-    }
-    if(left <= 0){
-      stopAuction();
-      postMessageLocal({sender:'بات', text: 'حراج به پایان رسید. چت برای همه باز شد.', role:'bot'});
-      state.allowUserChat = true;
-      updateChatAccessDisplay();
-      // sync to child windows
-      if(state.chatWindow && !state.chatWindow.closed){
-        try{ state.chatWindow.postMessage({type:'sync_all', payload: JSON.parse(localStorage.getItem(messagesKey) || '[]')}, '*'); } catch(e){}
-      }
-    }
-  }, 1000);
-  postMessageLocal({sender:'بات', text:'حراج شروع شد.', role:'bot'});
-  // While auction, only admin allowed
-  state.allowUserChat = false;
-  updateChatAccessDisplay();
+function finishAuction(){
+  if(state.timerInterval){ clearInterval(state.timerInterval); state.timerInterval = null; }
+  state.running = false;
+  state.endsAt = null;
+  saveState({running:false, endsAt:null});
+  postBotMessage('حراج به پایان رسید.');
+  // open bidding to all
+  state.allowUserBids = true;
+  updateUIRunning();
+  logSystem('حراج پایان یافت.');
+  syncChildWindow();
 }
 
 function stopAuction(){
-  if(state.auctionTimer){ clearInterval(state.auctionTimer); state.auctionTimer = null; state.auctionEndsAt = null; updateTimerDisplay(); }
-  postMessageLocal({sender:'سیستم', text:'حراج متوقف شد', role:'bot'});
+  if(!state.running){ alert('حراج در حال اجرا نیست'); return; }
+  if(state.timerInterval){ clearInterval(state.timerInterval); state.timerInterval = null; }
+  state.running = false; state.endsAt = null; saveState({running:false, endsAt:null});
+  postBotMessage('حراج توسط ادمین متوقف شد.');
+  state.allowUserBids = false;
+  updateUIRunning();
+  logSystem('حراج توسط ادمین متوقف شد');
+  syncChildWindow();
 }
 
-function updateTimerDisplay(leftSeconds){
-  if(leftSeconds === undefined){
-    if(state.auctionEndsAt) leftSeconds = Math.max(0, Math.floor((state.auctionEndsAt - Date.now())/1000));
+function postBotMessage(text){
+  const bids = loadBids();
+  // store bot message into log (not into bids)
+  saveLog(text);
+  renderLog();
+  // also push into bids as system note if desired (optional)
+  // broadcast to child windows
+  syncChildWindow();
+}
+
+// chat lock
+function setChatLock(lock){
+  state.allowUserBids = !lock;
+  logSystem(lock ? 'چت قفل شد (فقط ادمین)' : 'چت باز شد (کاربران می‌توانند پیشنهاد دهند)');
+  updateUIRunning();
+  syncChildWindow();
+}
+
+// child window (plugin) open
+function openChildWindow(){
+  // create a small HTML via data URI so it's self-contained and offline
+  const currentBids = loadBids();
+  const token = localStorage.getItem(TOKEN_KEY) || '';
+  const allow = state.allowUserBids || state.isAdmin;
+  const childHtml = `
+  <!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>روم — پلاگین</title>
+  <style>body{margin:0;font-family:sans-serif;background:#071026;color:#e6fbff}header{background:#0b2333;padding:8px;text-align:center;font-weight:700}main{padding:10px}#msgs{height:260px;overflow:auto;background:#021026;padding:8px;border-radius:8px}input{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}button{background:${escapeForCss(''+getComputedStyle(document.documentElement).getPropertyValue('--accent')||'#f59e0b')};color:#082022;border:none;padding:8px 12px;border-radius:8px}</style></head>
+  <body><header>روم مزایده — پلاگین</header><main><div class="tiny">توکن: <strong>${token}</strong></div><div id="msgs"></div><div style="margin-top:8px;display:flex;gap:8px"><input id="inp" placeholder="${allow ? 'پیشنهاد...' : 'فعلاً فقط ادمین'}" ${allow ? '' : 'disabled'}><button id="send" ${allow ? '' : 'disabled'}>ارسال</button></div></main>
+  <script>
+    const initial = ${JSON.stringify(currentBids)};
+    const area = document.getElementById('msgs');
+    function render(arr){ area.innerHTML=''; arr.forEach(m=>{ const d=document.createElement('div'); d.style.padding='6px'; d.style.margin='6px 0'; d.style.borderRadius='6px'; d.style.background='rgba(255,255,255,0.02)'; d.textContent = (m.bidder? '['+m.bidder+'] ':'') + m.amount; area.appendChild(d);}); area.scrollTop = area.scrollHeight; }
+    render(initial);
+    document.getElementById('send').addEventListener('click', ()=>{ const v = document.getElementById('inp').value.trim(); if(!v) return; if(window.opener) window.opener.postMessage({type:'child_bid', text:v}, '*'); document.getElementById('inp').value=''; });
+    window.addEventListener('message', (e)=>{ try{ const d=e.data; if(d && d.type==='sync_bids'){ render(d.payload); } }catch(e){} });
+    // notify opener ready
+    if(window.opener) window.opener.postMessage({type:'child_ready'}, '*');
+  </script></body></html>
+  `;
+  const url = 'data:text/html;charset=utf-8,' + encodeURIComponent(childHtml);
+  const w = window.open(url, '_blank', 'width=420,height=420,menubar=no,toolbar=no');
+  state.childWindow = w;
+}
+
+// listen to child
+window.addEventListener('message', (ev)=>{
+  try{
+    const d = ev.data;
+    if(!d) return;
+    if(d.type === 'child_bid'){ // child asked to place bid (text)
+      const text = String(d.text).trim();
+      // interpret as number attempt
+      const num = Number(text);
+      if(isNaN(num)){ alert('مقدار نامعتبر از پنجرهٔ جدا ارسال شد'); return; }
+      // place bid under anonymous name
+      if(!state.allowUserBids && !state.isAdmin){ alert('فعلا فقط ادمین می‌تواند پیشنهاد دهد'); return; }
+      const bids = loadBids();
+      const current = bids.length ? bids[bids.length-1].amount : Number($('#startPrice').value) - Number($('#minIncrement').value);
+      const minInc = Number($('#minIncrement').value) || loadSettings().minIncrement;
+      if(num < current + minInc){ alert('پیشنهاد خیلی کم است'); return; }
+      bids.push({id:'b'+Date.now(), bidder:'پنجره-کاربر', amount:num, ts: now()});
+      saveBids(bids);
+      renderBids();
+      logSystem('پیشنهاد از پنجرهٔ جدا ثبت شد: ' + num);
+      syncChildWindow();
+    } else if(d.type === 'child_ready'){
+      // send current bids
+      try{ ev.source.postMessage({type:'sync_bids', payload: loadBids()}, '*'); } catch(e){}
+    }
+  }catch(e){}
+});
+
+// sync child window
+function syncChildWindow(){
+  if(state.childWindow && !state.childWindow.closed){
+    try{ state.childWindow.postMessage({type:'sync_bids', payload: loadBids()}, '*'); } catch(e){}
   }
-  const el = $('#timerDisplay');
-  if(state.auctionEndsAt && leftSeconds > 0){
-    el.textContent = 'تایمر: ' + formatSeconds(leftSeconds);
-    $('#roomState').textContent = 'حراج فعال';
-  } else {
-    el.textContent = 'تایمر: --:--:--';
-    $('#roomState').textContent = 'وضعیت: آماده';
-  }
 }
 
-function formatSeconds(s){
-  const hh = String(Math.floor(s/3600)).padStart(2,'0');
-  const mm = String(Math.floor((s%3600)/60)).padStart(2,'0');
-  const ss = String(s%60).padStart(2,'0');
-  return `${hh}:${mm}:${ss}`;
-}
+// utility
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); }
+function getComputedStyleVal(k){ return getComputedStyle(document.documentElement).getPropertyValue(k) || ''; }
+function escapeForCss(s){ return (''+s).replace(/"/g,'\\"'); }
 
-function updateChatAccessDisplay(){
-  $('#chatAccess').textContent = state.allowUserChat ? 'همه' : 'فقط ادمین';
-  // enable input only if allowed or admin
-  const allow = state.allowUserChat || state.isAdmin;
-  $('#chatInput').disabled = !allow;
-  $('#sendBtn').disabled = !allow;
-  // propagate to child window
-  if(state.chatWindow && !state.chatWindow.closed){
-    try{ state.chatWindow.postMessage({type:'sync_all', payload: JSON.parse(localStorage.getItem(messagesKey) || '[]')}, '*'); } catch(e){}
-  }
-}
-
-function toggleUserChatAccess(){
-  state.allowUserChat = !state.allowUserChat;
-  updateChatAccessDisplay();
-  postMessageLocal({sender:'سیستم', text: state.allowUserChat ? 'چت برای همه باز شد' : 'چت فقط برای ادمین باقی می‌ماند', role:'bot'});
-}
-
-// Download standalone catalog: create a minimal HTML snapshot and download
-function downloadStandaloneCatalog(){
-  const products = JSON.parse(localStorage.getItem(productsKey) || '[]');
-  const content = buildStandaloneCatalogHtml(products);
-  const blob = new Blob([content], {type: 'text/html;charset=utf-8'});
+// export & download
+function downloadLog(){
+  const arr = JSON.parse(localStorage.getItem(LOG_KEY) || '[]');
+  const txt = arr.map(r=> new Date(r.ts).toLocaleString() + ' — ' + r.text).join('\\n');
+  const blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'alf_catalog_standalone.html';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
+  const a = document.createElement('a'); a.href = url; a.download = 'auction_log.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+function exportCsv(){
+  const bids = loadBids();
+  const rows = [['id','bidder','amount','ts']].concat(bids.map(b=>[b.id, b.bidder, b.amount, new Date(b.ts).toISOString()]));
+  const csv = rows.map(r=> r.map(v=> '"'+String(v).replace(/"/g,'""') +'"').join(',')).join('\\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'}); const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'bids.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
 }
 
-function buildStandaloneCatalogHtml(products){
-  // simple standalone page that lists products (offline)
-  const rows = products.map(p=>`<div style="padding:10px;border-radius:8px;background:#021026;margin-bottom:8px">
-    <div style="font-weight:700">${escapeHtml(p.title)}</div>
-    <div style="color:#9fd6e0">$${escapeHtml(p.price)}</div></div>`).join('');
-  return `<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>کاتالوگ ALF — مستقل</title>
-  <style>body{font-family:sans-serif;background:#071026;color:#e6fbff;padding:20px}h1{margin-top:0}.prod{max-width:720px}</style></head><body><h1>کاتالوگ (ALF)</h1><div class="prod">${rows || '<div>هیچ محصولی ثبت نشده است.</div>'}</div><footer style="margin-top:20px;color:#9fd6e0;font-size:13px">تولیدشده توسط ALF — نسخهٔ آفلاین</footer></body></html>`;
-}
+// download log wrapper
+function downloadLog(){ downloadLog; }
 
-// small utility to expose admin PIN changing option via console if needed
-console.log('ALF App2 loaded. برای تنظیم PIN مدیریتی می‌توانید در console مقدار localStorage.setItem("alf_settings_v1", JSON.stringify({adminPin:"NEWPIN"})) را اجرا و سپس صفحه را رفرش کنید.');
-
-// init app
+// render functions called once init
 init();
-updateChatAccessDisplay();
+
+// expose some functions for console tweaking (optional)
+window.__ALF = { placeBid, startAuctionFromInputs, finishAuction, stopAuction, genToken };
+
 </script>
 </body>
 </html>
