@@ -1,217 +1,543 @@
-<!DOCTYPE html>
+<!-- File: app2_real.html
+     ALF — App2 (واقعی، آفلاین، self-contained)
+     Save as app2_real.html and open in a browser.
+-->
+<!doctype html>
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>آلف — SiteBuilder (TemplateOS + XML) — Preview</title>
+<title>ALF — App2 (آفلاین واقعی)</title>
 <style>
-  :root{--bg:#0f1114;--panel:#121417;--accent:#3bd0ff;--text:#e6eef6}
-  *{box-sizing:border-box}
-  body{margin:0;background:linear-gradient(180deg,#07080a,#0f1114);color:var(--text);font-family:Tahoma,system-ui,Segoe UI,Roboto}
-  header{padding:14px 18px;background:linear-gradient(90deg,#07080a,#0c1116);display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,0.03)}
-  header h1{font-size:18px;margin:0;font-weight:600}
-  .wrap{display:flex;gap:12px;padding:16px}
-  .col{background:var(--panel);border-radius:10px;padding:12px;box-shadow:0 6px 20px rgba(0,0,0,.6);min-height:420px}
-  .left{width:36%;display:flex;flex-direction:column}
-  .mid{width:40%}
-  .right{width:24%;display:flex;flex-direction:column}
-  .title{font-weight:600;color:var(--accent);margin-bottom:8px}
-  textarea.xml{width:100%;height:320px;background:#0b0c0e;color:var(--text);border-radius:8px;border:1px solid rgba(255,255,255,0.03);padding:12px;font-family:monospace;resize:vertical}
-  .controls{display:flex;gap:8px;margin-bottom:8px}
-  button{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text);padding:8px 10px;border-radius:8px;cursor:pointer}
-  button.primary{background:linear-gradient(90deg,var(--accent),#6ef);border:none;color:#002}
-  iframe.preview{width:100%;height:320px;border-radius:8px;border:1px solid rgba(0,0,0,0.3);background:white}
-  .chat{flex:1;display:flex;flex-direction:column;gap:8px}
-  .messages{background:#08090a;padding:8px;border-radius:8px;height:320px;overflow:auto;border:1px solid rgba(255,255,255,0.02)}
-  .msg{padding:6px 8px;border-radius:6px;margin-bottom:6px}
-  .msg.you{background:linear-gradient(90deg,#1b8f6b22,#1b8f6b11);text-align:right}
-  .msg.bot{background:linear-gradient(90deg,#234a8f22,#11224411);text-align:left}
-  .chat-input{display:flex;gap:8px}
-  input[type="text"]{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)}
-  .dropzone{border:2px dashed rgba(255,255,255,0.03);padding:10px;border-radius:8px;text-align:center;color:rgba(255,255,255,0.35);cursor:pointer}
-  .small{font-size:13px;color:rgba(255,255,255,0.5)}
-  nav.preview-nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
-  nav.preview-nav button{padding:6px 10px;border-radius:6px;font-size:13px}
-  footer{padding:10px;text-align:center;color:rgba(255,255,255,0.35);font-size:12px}
+  :root{
+    --bg:#071026; --panel:#091a2a; --accent:#06b6d4; --muted:#9fd6e0; --card:#021026;
+  }
+  html,body{height:100%;margin:0;font-family: "Segoe UI", Roboto, Arial, sans-serif;background: linear-gradient(180deg,#041025 0%, #071026 100%);color: #e6fbff;}
+  .app{display:flex;height:100vh;gap:10px;padding:12px;box-sizing:border-box;}
+  .left{flex:1; background:var(--panel); padding:14px;border-radius:12px; box-shadow: 0 8px 24px rgba(2,6,23,0.6); overflow:auto;}
+  .right{width:420px; background:linear-gradient(180deg,#071026,#051423); padding:14px;border-radius:12px; box-shadow: 0 8px 24px rgba(2,6,23,0.6); display:flex; flex-direction:column;}
+  header{display:flex;align-items:center;gap:12px}
+  h1{margin:0;font-size:20px}
+  .controls{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .btn{background:var(--accent);color:#022029;padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
+  .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:8px;color:var(--muted);cursor:pointer}
+  .section{margin-top:14px}
+  .card{background:var(--card);padding:12px;border-radius:10px;margin-bottom:10px}
+  .product{display:flex;gap:12px;align-items:center;padding:10px;background:rgba(255,255,255,0.02);border-radius:10px;margin-bottom:8px}
+  .product img{width:86px;height:86px;object-fit:cover;border-radius:8px}
+  .meta{flex:1}
+  .price{font-weight:700;color:var(--accent)}
+  .small{font-size:13px;opacity:0.85}
+  /* Right / Plugin (Room) */
+  .room-header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.03)}
+  .chat{flex:1; display:flex; flex-direction:column; gap:8px; padding:10px 0; overflow:auto}
+  .msg{background:rgba(255,255,255,0.02);padding:8px;border-radius:8px;max-width:92%;}
+  .msg.admin{background:linear-gradient(90deg,#063246,#083b50); color:#dff6ff; font-weight:600}
+  .msg.me{background:linear-gradient(90deg,#0b3a3a,#0f5353); color:#fff; margin-left:auto}
+  .msg.bot{background:rgba(255,255,255,0.01);font-style:italic;opacity:0.95}
+  .chat-controls{display:flex;gap:8px;padding-top:8px}
+  input[type="text"]{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+  /* token badge */
+  .badge{background:#052b33;color:#9ff;border-radius:8px;padding:6px 8px;font-weight:700}
+  /* modal */
+  .modal-back{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:60}
+  .modal{background:linear-gradient(180deg,#0b2240,#061427);padding:18px;border-radius:12px;width:min(720px,92%);color:#e6fbff}
+  label{display:block;margin-bottom:6px;font-size:13px;color:var(--muted)}
+  .form-row{margin-bottom:10px}
+  .tiny{font-size:12px;opacity:0.8}
+  footer{font-size:12px;color:var(--muted);opacity:0.9;margin-top:8px}
+  /* responsive */
+  @media (max-width:900px){ .right{width:360px} .app{flex-direction:column} }
 </style>
 </head>
 <body>
-<header>
-  <h1>آلف — SiteBuilder (TemplateOS + XML) — پیش‌نمایش</h1>
-</header>
-
-<div class="wrap">
-  <div class="col left">
-    <div class="title">Editor — TemplateOS XML</div>
-    <div class="controls">
-      <button id="loadExample">بارگذاری مثال</button>
-      <button id="parseBtn" class="primary">پیش‌نمایش زنده</button>
-    </div>
-    <textarea id="xmlEditor" class="xml" spellcheck="false"></textarea>
-    <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
-      <div class="dropzone" id="dropzone">فایل یا تصویر را بکش و رها کن (برای شبیه‌سازی)</div>
-      <div class="small">مثال: &lt;page id="home"&gt; ...</div>
-    </div>
-  </div>
-
-  <div class="col mid">
-    <div class="title">پیش‌نمایش سایت</div>
-    <nav class="preview-nav" id="navButtons"></nav>
-    <iframe id="previewFrame" class="preview"></iframe>
-  </div>
-
-  <div class="col right">
-    <div class="title">روم چت (شبیه‌ساز)</div>
-    <div class="chat">
-      <div class="messages" id="messages"></div>
-      <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
-        <input id="chatInput" type="text" placeholder="پیام بنویس..." />
-        <button id="sendBtn" class="primary">ارسال</button>
+<div class="app" role="application" aria-label="ALF App2">
+  <div class="left" id="catalog">
+    <header>
+      <h1>آلف — کاتالوگ</h1>
+      <div class="controls" id="leftControls">
+        <div class="badge" id="tokenBadge" title="توکن دانلود/دعوت">—</div>
+        <button class="btn" id="createTokenBtn">ساخت توکن</button>
+        <button class="ghost" id="downloadHtmlBtn" title="دانلود نسخهٔ مستقل کاتالوگ">دانلود مستقل</button>
       </div>
-      <div style="margin-top:10px">
-        <div class="small">بات شبیه‌ساز: پاسخ‌ها محلی‌اند. برای ربات واقعی نیاز به سرور/توکن دارید.</div>
+    </header>
+
+    <div class="section card" id="adminPanel" style="display:none">
+      <div style="display:flex;align-items:center;gap:10px">
+        <strong>پنل ادمین</strong>
+        <div style="margin-left:auto" class="small">وضعیت: <span id="adminStatus">ادمین</span></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <button class="btn" id="openRoomBtn">باز کردن روم در پنجرهٔ جدا</button>
+        <button class="ghost" id="startAuctionBtn">شروع حراج (10 دقیقه)</button>
+        <button class="ghost" id="stopAuctionBtn">متوقف کردن حراج</button>
+        <button class="ghost" id="toggleUserChatBtn">فقط ادمین پیغام بفرست / همه</button>
+      </div>
+      <div style="margin-top:10px" class="small">PIN ادمین: <span id="adminPinDisplay">****</span></div>
+    </div>
+
+    <div class="section">
+      <h3 style="margin-bottom:6px">محصولات</h3>
+      <div id="productsList">
+        <!-- dynamically populated -->
       </div>
     </div>
 
-    <div style="height:14px"></div>
-    <div class="title">ابزارها</div>
-    <button id="exportBtn">صدور XML (برای دانلود)</button>
-    <button id="copyHtml">کپی HTML پیش‌نمایش</button>
+    <div class="section card">
+      <h3 style="margin:0 0 8px 0">افزودن محصول (نمایشی)</h3>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="pTitle" placeholder="نام محصول" style="padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+        <input id="pPrice" placeholder="قیمت" style="width:120px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+        <button class="btn" id="addProductBtn">افزودن</button>
+      </div>
+      <div class="tiny" style="margin-top:8px;color:var(--muted)">افزودن فقط محلی است و در localStorage ذخیره می‌شود.</div>
+    </div>
+
+    <div class="section small card">
+      <strong>توضیحات:</strong>
+      <p class="tiny">این نسخه آفلاین است. روم به‌صورت پنجرهٔ جدا (مثل پلاگین) باز می‌شود و بات به‌صورت محلی زمان‌بندی را مدیریت می‌کند.</p>
+    </div>
+  </div>
+
+  <div class="right" id="roomWrap" aria-live="polite">
+    <div class="room-header">
+      <div>
+        <strong>روم (پلاگین)</strong><div class="tiny" id="roomState">وضعیت: آماده</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="ghost" id="togglePinBtn" title="ورود ادمین">ورود ادمین</button>
+        <button class="btn" id="openWindowBtn" title="باز کردن روم در پنجرهٔ جدا">پنجرۀ جدا</button>
+      </div>
+    </div>
+
+    <div class="chat" id="chatArea" role="log" aria-relevant="additions">
+      <!-- messages -->
+    </div>
+
+    <div class="chat-controls">
+      <input type="text" id="chatInput" placeholder="پیام..." aria-label="متن پیام" />
+      <button class="btn" id="sendBtn">ارسال</button>
+    </div>
+
+    <div style="margin-top:8px;display:flex;gap:8px;align-items:center;justify-content:space-between">
+      <div class="tiny" id="timerDisplay">تایمر: --:--:--</div>
+      <div class="tiny">دسترسی چت: <span id="chatAccess">فقط ادمین</span></div>
+    </div>
   </div>
 </div>
 
-<footer>آلف — نسخهٔ اولیهٔ UI. (MVP) — عارف 18 ساله</footer>
+<!-- modal for PIN -->
+<div id="modalRoot" style="display:none"></div>
 
 <script>
-// مثال اولیه XML
-const example = `<alf-project version="1.0">
-  <meta>
-    <title>آلف — فروشگاه نمونه</title>
-    <author>ARef999ms</author>
-  </meta>
-  <pages>
-    <page id="home"><title>خانه</title><content>به فروشگاه آزمایشی آلف خوش آمدید.</content></page>
-    <page id="catalog"><title>کاتالوگ</title><content>اینجا محصولات شما نمایش داده می‌شود.</content></page>
-    <page id="chat"><title>روم</title><content>چت عمومی آفلاین.</content></page>
-  </pages>
-</alf-project>`;
+/* ========= Client-side App2 logic (offline) =========
+ - Uses localStorage to persist products, messages, admin PIN and instances.
+ - Admin PIN default: "1234" (you can change via localStorage or modify code).
+ - Ability to open a detached room window (window.open) and sync via postMessage.
+ - Auction bot: when auction started, bot posts timer ticks and at end opens chat for users.
+ - Token generation: pseudo-random token saved locally.
+*/
 
-// المان‌ها
-const xmlEditor = document.getElementById('xmlEditor');
-const parseBtn = document.getElementById('parseBtn');
-const loadExample = document.getElementById('loadExample');
-const previewFrame = document.getElementById('previewFrame');
-const navButtons = document.getElementById('navButtons');
-const messages = document.getElementById('messages');
-const chatInput = document.getElementById('chatInput');
-const sendBtn = document.getElementById('sendBtn');
-const exportBtn = document.getElementById('exportBtn');
-const copyHtml = document.getElementById('copyHtml');
-const dropzone = document.getElementById('dropzone');
+// Utility
+const $ = (q,root=document) => root.querySelector(q);
+const tokenKey = 'alf_token_v1';
+const productsKey = 'alf_products_v1';
+const messagesKey = 'alf_messages_v1';
+const settingsKey = 'alf_settings_v1';
+const adminPinDefault = '1234';
 
-xmlEditor.value = example;
+// State
+let state = {
+  isAdmin: false,
+  adminPin: localStorage.getItem(settingsKey) ? JSON.parse(localStorage.getItem(settingsKey)).adminPin || adminPinDefault : adminPinDefault,
+  token: localStorage.getItem(tokenKey) || null,
+  chatWindow: null,
+  auctionTimer: null,
+  auctionEndsAt: null,
+  allowUserChat: false
+};
 
-// ساده‌ساز XML -> JS parser (خیلی ساده، برای MVP)
-function parseProject(xmlText){
-  try{
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(xmlText,'application/xml');
-    if(doc.querySelector('parsererror')) return {error:true, msg:'XML نامعتبر'};
-    const proj = {};
-    const meta = doc.querySelector('meta');
-    proj.title = meta?.querySelector('title')?.textContent || 'بدون عنوان';
-    proj.author = meta?.querySelector('author')?.textContent || '';
-    proj.pages = [];
-    const pages = doc.querySelectorAll('pages page');
-    pages.forEach(p=>{
-      proj.pages.push({
-        id: p.getAttribute('id') || Math.random().toString(36).slice(2,7),
-        title: p.querySelector('title')?.textContent || 'بدون عنوان',
-        content: p.querySelector('content')?.textContent || ''
-      });
-    });
-    return proj;
-  }catch(e){
-    return {error:true, msg:e.message};
+// Init
+function init(){
+  if(!localStorage.getItem(productsKey)){
+    const sample = [
+      {id: 'p1', title: 'ساعت لوکس', price: '12000', img: null},
+      {id: 'p2', title: 'عینک نادر', price: '4000', img: null}
+    ];
+    localStorage.setItem(productsKey, JSON.stringify(sample));
+  }
+  if(!localStorage.getItem(messagesKey)) localStorage.setItem(messagesKey, JSON.stringify([]));
+  if(!localStorage.getItem(settingsKey)) localStorage.setItem(settingsKey, JSON.stringify({adminPin:adminPinDefault}));
+  state.adminPin = JSON.parse(localStorage.getItem(settingsKey)).adminPin || adminPinDefault;
+  state.token = localStorage.getItem(tokenKey) || null;
+
+  renderProducts();
+  renderMessages();
+  updateTokenBadge();
+  updateAdminPanel();
+  updateTimerDisplay();
+  bindUI();
+  // Listen for postMessage from child windows
+  window.addEventListener('message', receiveMessageFromChild);
+}
+
+// UI rendering
+function renderProducts(){
+  const list = JSON.parse(localStorage.getItem(productsKey) || '[]');
+  const container = $('#productsList');
+  container.innerHTML = '';
+  for(const p of list){
+    const el = document.createElement('div');
+    el.className = 'product';
+    el.innerHTML = `<div style="width:86px;height:86px;background:linear-gradient(180deg,#0b2a3a,#042428);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted)">${p.img ? `<img src="${p.img}" alt="${escapeHtml(p.title)}">` : '<div style="padding:6px;text-align:center">تصویر</div>'}</div>
+      <div class="meta"><div style="font-weight:700">${escapeHtml(p.title)}</div><div class="small">توضیحات کوتاه</div></div>
+      <div style="text-align:left"><div class="price">$${escapeHtml(p.price)}</div><div style="margin-top:8px"><button class="btn" onclick="startPrivateChat('${p.id}')">شروع چت</button></div></div>`;
+    container.appendChild(el);
   }
 }
 
-// ساخت HTML ساده از پروژه
-function buildPreviewHTML(proj){
-  const nav = proj.pages.map(p=>`<a class="link" href="#${p.id}" data-id="${p.id}">${p.title}</a>`).join(' | ');
-  const body = proj.pages.map(p=>`<section id="${p.id}" style="padding:18px"><h2>${p.title}</h2><div>${p.content}</div></section>`).join('');
-  return `<!doctype html><html lang="fa"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${proj.title}</title>
-  <style>body{font-family:Tahoma,Arial;padding:10px;background:#fff;color:#111}nav{background:#f3f3f3;padding:8px;border-radius:6px;margin-bottom:10px}section{border:1px solid #eee;padding:12px;border-radius:6px;margin-bottom:10px}</style>
-  </head><body><h1>${proj.title}</h1><nav>${nav}</nav>${body}</body></html>`;
+function renderMessages(){
+  const msgs = JSON.parse(localStorage.getItem(messagesKey) || '[]');
+  const area = $('#chatArea');
+  area.innerHTML = '';
+  for(const m of msgs){
+    const d = document.createElement('div');
+    d.className = 'msg ' + (m.role==='admin'?'admin': m.role==='bot' ? 'bot' : (m.me? 'me':'' ));
+    d.textContent = `${m.sender ? '['+m.sender+'] ' : ''}${m.text}`;
+    area.appendChild(d);
+  }
+  area.scrollTop = area.scrollHeight;
 }
 
-// اعمال پیش‌نمایش
-function renderPreview(){
-  const xml = xmlEditor.value;
-  const proj = parseProject(xml);
-  if(proj.error){
-    previewFrame.srcdoc = `<pre style="color:red">${proj.msg}</pre>`;
+// Helpers
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"})[c];}); }
+
+// Events & actions
+function bindUI(){
+  $('#addProductBtn').addEventListener('click', ()=>{
+    const t = $('#pTitle').value.trim(); const pr = $('#pPrice').value.trim();
+    if(!t || !pr){ alert('عنوان و قیمت را وارد کن'); return; }
+    const list = JSON.parse(localStorage.getItem(productsKey));
+    const id = 'p' + Date.now();
+    list.push({id, title:t, price:pr, img:null});
+    localStorage.setItem(productsKey, JSON.stringify(list));
+    $('#pTitle').value=''; $('#pPrice').value='';
+    renderProducts();
+  });
+
+  $('#createTokenBtn').addEventListener('click', ()=>{
+    const tok = generateToken();
+    state.token = tok;
+    localStorage.setItem(tokenKey, tok);
+    updateTokenBadge();
+    alert('توکن ساخته شد:\n' + tok + '\nاین توکن را برای دعوت/دانلود می‌توان استفاده کرد (نمایشی).');
+  });
+
+  $('#downloadHtmlBtn').addEventListener('click', downloadStandaloneCatalog);
+
+  $('#openWindowBtn').addEventListener('click', ()=> openRoomWindow());
+  $('#openRoomBtn')?.addEventListener('click', ()=> openRoomWindow());
+
+  $('#sendBtn').addEventListener('click', sendChatFromInput);
+  $('#chatInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') sendChatFromInput(); });
+
+  $('#togglePinBtn').addEventListener('click', showPinModal);
+  $('#toggleUserChatBtn')?.addEventListener('click', toggleUserChatAccess);
+  $('#startAuctionBtn')?.addEventListener('click', ()=> startAuction(10*60)); // 10 minutes
+  $('#stopAuctionBtn')?.addEventListener('click', stopAuction);
+}
+
+function generateToken(){
+  const a = Math.random().toString(36).slice(2,10).toUpperCase();
+  const b = Math.random().toString(36).slice(2,8).toUpperCase();
+  return a+'-'+b;
+}
+
+function updateTokenBadge(){
+  $('#tokenBadge').textContent = state.token || 'ندارد';
+}
+
+// Chat send
+function sendChatFromInput(){
+  const txt = $('#chatInput').value.trim();
+  if(!txt) return;
+  if(!state.isAdmin && !state.allowUserChat){
+    alert('فعلا فقط ادمین می‌تواند پیام ارسال کند.');
     return;
   }
-  previewFrame.srcdoc = buildPreviewHTML(proj);
-  // ساخت دکمه‌های ناوبری
-  navButtons.innerHTML = '';
-  proj.pages.forEach(p=>{
-    const b = document.createElement('button');
-    b.textContent = p.title;
-    b.onclick = ()=> previewFrame.contentWindow.location.hash = '#'+p.id;
-    navButtons.appendChild(b);
+  postMessageLocal({sender: state.isAdmin ? 'ادمین' : 'کاربر', text: txt, role: state.isAdmin ? 'admin' : 'user', me: !state.isAdmin});
+  $('#chatInput').value='';
+}
+
+function postMessageLocal(msg){
+  const arr = JSON.parse(localStorage.getItem(messagesKey) || '[]');
+  arr.push({...msg, ts: Date.now()});
+  localStorage.setItem(messagesKey, JSON.stringify(arr));
+  renderMessages();
+  // propagate to child windows if open
+  if(state.chatWindow && !state.chatWindow.closed){
+    try{ state.chatWindow.postMessage({type:'new_message', payload:msg}, '*'); } catch(e){}
+  }
+}
+
+// Admin / PIN modal
+function showPinModal(){
+  const root = $('#modalRoot');
+  root.innerHTML = `<div class="modal-back"><div class="modal">
+    <h3>ورود ادمین</h3>
+    <div class="form-row"><label>PIN ادمین</label><input id="pinInput" type="text" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end"><button class="ghost" id="cancelPin">انصراف</button><button class="btn" id="confirmPin">ورود</button></div>
+    <div class="tiny" style="margin-top:10px;color:var(--muted)">PIN اولیه: <strong>${state.adminPin}</strong> (قابل تغییر از localStorage)</div>
+  </div></div>`;
+  root.style.display='block';
+  $('#cancelPin').addEventListener('click', ()=>{ root.style.display='none'; root.innerHTML=''; });
+  $('#confirmPin').addEventListener('click', ()=>{
+    const v = $('#pinInput').value.trim();
+    if(v === state.adminPin){
+      state.isAdmin = true;
+      localStorage.setItem(settingsKey, JSON.stringify({adminPin: state.adminPin}));
+      root.style.display='none'; root.innerHTML='';
+      updateAdminPanel();
+      postMessageLocal({sender:'سیستم', text:'ادمین وارد شد', role:'bot'});
+    } else {
+      alert('PIN اشتباه است.');
+    }
   });
 }
 
-parseBtn.addEventListener('click', renderPreview);
-loadExample.addEventListener('click', ()=>{ xmlEditor.value = example; renderPreview(); });
-
-// chat (شبیه‌ساز محلی)
-function pushMessage(text, who='you'){
-  const el = document.createElement('div');
-  el.className = 'msg ' + (who==='you'?'you':'bot');
-  el.textContent = text;
-  messages.appendChild(el);
-  messages.scrollTop = messages.scrollHeight;
+// Admin UI toggle
+function updateAdminPanel(){
+  const panel = $('#adminPanel');
+  if(state.isAdmin){ panel.style.display='block'; $('#adminPinDisplay').textContent = '******'; $('#adminStatus').textContent='ادمین'; $('#togglePinBtn').textContent='خروج ادمین'; }
+  else { panel.style.display='none'; $('#adminStatus').textContent='مخاطب'; $('#togglePinBtn').textContent='ورود ادمین'; }
+  // togglePinBtn behaviour to logout as well
+  $('#togglePinBtn').onclick = ()=> {
+    if(state.isAdmin){ state.isAdmin=false; updateAdminPanel(); postMessageLocal({sender:'سیستم', text:'ادمین خارج شد', role:'bot'}); }
+    else showPinModal();
+  };
 }
-sendBtn.addEventListener('click', ()=>{
-  const txt = chatInput.value.trim();
-  if(!txt) return;
-  pushMessage(txt,'you');
-  chatInput.value = '';
-  // پاسخ شبیه‌ساز ساده
-  setTimeout(()=> pushMessage('بات: پیام دریافت شد — (شبیه‌ساز پاسخ)', 'bot'), 700);
-});
-chatInput.addEventListener('keydown', e=>{ if(e.key==='Enter') sendBtn.click(); });
 
-// export xml
-exportBtn.addEventListener('click', ()=>{
-  const blob = new Blob([xmlEditor.value], {type:'application/xml'});
+// Room window handling
+function openRoomWindow(){
+  // open a minimal window showing room.html content - we'll generate inline content via data URL to keep offline single-file
+  const features = 'width=420,height=360,menubar=no,toolbar=no,location=no,status=no';
+  // Build a small HTML to open in child window, with messaging bridge
+  const childHtml = buildChildWindowHtml();
+  const url = 'data:text/html;charset=utf-8,' + encodeURIComponent(childHtml);
+  const w = window.open(url, '_blank', features);
+  state.chatWindow = w;
+}
+
+// child window html builder
+function buildChildWindowHtml(){
+  // We'll include a small script that posts messages to opener and listens for new_message events
+  const msgs = JSON.parse(localStorage.getItem(messagesKey) || '[]');
+  const token = state.token || '';
+  const allow = state.allowUserChat;
+  return `
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ALF — روم جدا</title>
+<style>
+  body{font-family:sans-serif;background:#071026;color:#e6fbff;margin:0;padding:0}
+  header{background:#0b2333;padding:8px;text-align:center;font-weight:700}
+  .wrap{padding:10px}
+  .chat{height:260px;overflow:auto;background:#021026;padding:10px;border-radius:8px}
+  .msg{background:rgba(255,255,255,0.02);padding:8px;border-radius:8px;margin:6px 0}
+  .controls{display:flex;gap:8px;margin-top:8px}
+  input{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+  button{background:#06b6d4;color:#022;padding:8px 12px;border-radius:8px;border:none}
+  .tiny{font-size:12px;opacity:0.9;margin-top:8px}
+</style>
+</head>
+<body>
+<header>روم — پنجرهٔ جدا (ALF)</header>
+<div class="wrap">
+  <div class="tiny">توکن: <strong>${token}</strong></div>
+  <div class="chat" id="msgs"></div>
+  <div class="controls">
+    <input id="inp" placeholder="${allow ? 'پیام...' : 'فعلاً فقط ادمین می‌تواند پیام بفرستد'}" ${allow? '': 'disabled'}>
+    <button id="send" ${allow? '': 'disabled'}>ارسال</button>
+  </div>
+  <div class="tiny">این پنجره با پنجرهٔ مادر همگام می‌شود.</div>
+</div>
+<script>
+  // populate messages from opener snapshot
+  const initial = ${JSON.stringify(msgs)};
+  const area = document.getElementById('msgs');
+  function renderMsgs(arr){
+    area.innerHTML='';
+    for(const m of arr){
+      const d = document.createElement('div');
+      d.className='msg';
+      d.textContent = (m.sender? '['+m.sender+'] ':'') + m.text;
+      area.appendChild(d);
+    }
+    area.scrollTop = area.scrollHeight;
+  }
+  renderMsgs(initial);
+
+  // send to opener
+  document.getElementById('send').addEventListener('click', ()=>{
+    const val = document.getElementById('inp').value.trim();
+    if(!val) return;
+    // post to opener
+    if(window.opener) window.opener.postMessage({type:'child_send', payload: {text: val}}, '*');
+    document.getElementById('inp').value='';
+  });
+
+  // receive new messages from opener
+  window.addEventListener('message', (ev)=>{
+    try{
+      const d = ev.data;
+      if(d && d.type === 'new_message'){
+        initial.push(d.payload);
+        renderMsgs(initial);
+      } else if(d && d.type === 'sync_all'){
+        // replace
+        initial.length=0; Array.prototype.push.apply(initial, d.payload);
+        renderMsgs(initial);
+      }
+    }catch(e){}
+  }, false);
+
+  // try to notify opener that we're ready
+  if(window.opener) window.opener.postMessage({type:'child_ready'}, '*');
+</script>
+</body>
+</html>
+  `;
+}
+
+// receive messages from child window
+function receiveMessageFromChild(ev){
+  const d = ev.data;
+  if(!d) return;
+  if(d.type === 'child_send' && d.payload){
+    // child requested to send a message (user typed in child window)
+    // treat as user message and post locally (subject to permissions)
+    if(!state.allowUserChat && !state.isAdmin){
+      alert('در پنجرهٔ جدا کاربر اجازهٔ ارسال ندارد.');
+      return;
+    }
+    postMessageLocal({sender:'بازدیدکننده', text: d.payload.text, role:'user', me:false});
+  } else if(d.type === 'child_ready'){
+    // child ready -> send full sync
+    const msgs = JSON.parse(localStorage.getItem(messagesKey) || '[]');
+    try{ ev.source.postMessage({type:'sync_all', payload: msgs}, '*'); } catch(e){}
+  }
+}
+
+// private chat from product (simulated)
+function startPrivateChat(productId){
+  // show a quick message from admin (demo)
+  postMessageLocal({sender:'ادمین', text:'درخواست بررسی محصول '+productId+' ثبت شد. لطفا آماده باشید.', role:'admin'});
+  alert('درخواست چت خصوصی (نمایشی) برای ' + productId + ' ارسال شد.');
+}
+
+// Auction bot
+function startAuction(durationSeconds){
+  stopAuction(); // clear existing
+  const now = Date.now();
+  state.auctionEndsAt = now + durationSeconds*1000;
+  // schedule interval tick every second
+  state.auctionTimer = setInterval(()=>{
+    const left = Math.max(0, Math.floor((state.auctionEndsAt - Date.now())/1000));
+    updateTimerDisplay(left);
+    if(left % 10 === 0){ // every 10s, bot message to update
+      const mm = formatSeconds(left);
+      postMessageLocal({sender:'بات', text: `حراج: زمان باقی‌مانده ${mm}`, role:'bot'});
+    }
+    if(left <= 0){
+      stopAuction();
+      postMessageLocal({sender:'بات', text: 'حراج به پایان رسید. چت برای همه باز شد.', role:'bot'});
+      state.allowUserChat = true;
+      updateChatAccessDisplay();
+      // sync to child windows
+      if(state.chatWindow && !state.chatWindow.closed){
+        try{ state.chatWindow.postMessage({type:'sync_all', payload: JSON.parse(localStorage.getItem(messagesKey) || '[]')}, '*'); } catch(e){}
+      }
+    }
+  }, 1000);
+  postMessageLocal({sender:'بات', text:'حراج شروع شد.', role:'bot'});
+  // While auction, only admin allowed
+  state.allowUserChat = false;
+  updateChatAccessDisplay();
+}
+
+function stopAuction(){
+  if(state.auctionTimer){ clearInterval(state.auctionTimer); state.auctionTimer = null; state.auctionEndsAt = null; updateTimerDisplay(); }
+  postMessageLocal({sender:'سیستم', text:'حراج متوقف شد', role:'bot'});
+}
+
+function updateTimerDisplay(leftSeconds){
+  if(leftSeconds === undefined){
+    if(state.auctionEndsAt) leftSeconds = Math.max(0, Math.floor((state.auctionEndsAt - Date.now())/1000));
+  }
+  const el = $('#timerDisplay');
+  if(state.auctionEndsAt && leftSeconds > 0){
+    el.textContent = 'تایمر: ' + formatSeconds(leftSeconds);
+    $('#roomState').textContent = 'حراج فعال';
+  } else {
+    el.textContent = 'تایمر: --:--:--';
+    $('#roomState').textContent = 'وضعیت: آماده';
+  }
+}
+
+function formatSeconds(s){
+  const hh = String(Math.floor(s/3600)).padStart(2,'0');
+  const mm = String(Math.floor((s%3600)/60)).padStart(2,'0');
+  const ss = String(s%60).padStart(2,'0');
+  return `${hh}:${mm}:${ss}`;
+}
+
+function updateChatAccessDisplay(){
+  $('#chatAccess').textContent = state.allowUserChat ? 'همه' : 'فقط ادمین';
+  // enable input only if allowed or admin
+  const allow = state.allowUserChat || state.isAdmin;
+  $('#chatInput').disabled = !allow;
+  $('#sendBtn').disabled = !allow;
+  // propagate to child window
+  if(state.chatWindow && !state.chatWindow.closed){
+    try{ state.chatWindow.postMessage({type:'sync_all', payload: JSON.parse(localStorage.getItem(messagesKey) || '[]')}, '*'); } catch(e){}
+  }
+}
+
+function toggleUserChatAccess(){
+  state.allowUserChat = !state.allowUserChat;
+  updateChatAccessDisplay();
+  postMessageLocal({sender:'سیستم', text: state.allowUserChat ? 'چت برای همه باز شد' : 'چت فقط برای ادمین باقی می‌ماند', role:'bot'});
+}
+
+// Download standalone catalog: create a minimal HTML snapshot and download
+function downloadStandaloneCatalog(){
+  const products = JSON.parse(localStorage.getItem(productsKey) || '[]');
+  const content = buildStandaloneCatalogHtml(products);
+  const blob = new Blob([content], {type: 'text/html;charset=utf-8'});
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'alf-project.xml'; a.click(); URL.revokeObjectURL(url);
-});
+  const a = document.createElement('a');
+  a.href = url; a.download = 'alf_catalog_standalone.html';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 
-// copy preview html
-copyHtml.addEventListener('click', ()=>{
-  navigator.clipboard.writeText(previewFrame.srcdoc || '').then(()=> alert('HTML پیش‌نمایش کپی شد'));
-});
+function buildStandaloneCatalogHtml(products){
+  // simple standalone page that lists products (offline)
+  const rows = products.map(p=>`<div style="padding:10px;border-radius:8px;background:#021026;margin-bottom:8px">
+    <div style="font-weight:700">${escapeHtml(p.title)}</div>
+    <div style="color:#9fd6e0">$${escapeHtml(p.price)}</div></div>`).join('');
+  return `<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>کاتالوگ ALF — مستقل</title>
+  <style>body{font-family:sans-serif;background:#071026;color:#e6fbff;padding:20px}h1{margin-top:0}.prod{max-width:720px}</style></head><body><h1>کاتالوگ (ALF)</h1><div class="prod">${rows || '<div>هیچ محصولی ثبت نشده است.</div>'}</div><footer style="margin-top:20px;color:#9fd6e0;font-size:13px">تولیدشده توسط ALF — نسخهٔ آفلاین</footer></body></html>`;
+}
 
-// dropzone برای شبیه‌سازی افزودن تصویر (تصویر را URL می‌کند در XML)
-dropzone.addEventListener('dragover', e=>{ e.preventDefault(); dropzone.style.borderColor = '#3bd0ff'; });
-dropzone.addEventListener('dragleave', e=>{ dropzone.style.borderColor = '' });
-dropzone.addEventListener('drop', e=>{
-  e.preventDefault(); dropzone.style.borderColor='';
-  const f = e.dataTransfer.files && e.dataTransfer.files[0];
-  if(!f){ alert('فایل یا عنصر قابل‌پشتیبانی نیست'); return; }
-  // شبیه‌سازی: فقط اضافه کردن یک تگ <asset> با نام فایل در XML
-  const name = f.name;
-  xmlEditor.value = xmlEditor.value.replace(/<\/alf-project>/,'  <assets><asset file="'+name+'"/></assets>\n</alf-project>');
-  alert('فایل شبیه‌سازی شد: ' + name);
-});
+// small utility to expose admin PIN changing option via console if needed
+console.log('ALF App2 loaded. برای تنظیم PIN مدیریتی می‌توانید در console مقدار localStorage.setItem("alf_settings_v1", JSON.stringify({adminPin:"NEWPIN"})) را اجرا و سپس صفحه را رفرش کنید.');
 
-// بارگذاری اولیه
-renderPreview();
+// init app
+init();
+updateChatAccessDisplay();
 </script>
 </body>
 </html>
