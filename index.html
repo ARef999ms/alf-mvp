@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>پروژه آلف — TemplateOS + XML</title>
+
+    <style>
+        body {
+            margin: 0;
+            background: #0c0c0c;
+            font-family: sans-serif;
+            color: #e5e5e5;
+        }
+
+        header {
+            padding: 20px;
+            background: #111;
+            border-bottom: 1px solid #333;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .window {
+            margin: 30px auto;
+            width: 90%;
+            max-width: 900px;
+            background: #181818;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 0 20px #000;
+        }
+
+        .xml {
+            font-family: "Courier New", monospace;
+            background: #101010;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            white-space: pre-wrap;
+            direction: ltr;
+            text-align: left;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+
+        .section-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #4af;
+        }
+    </style>
+</head>
+<body>
+
+<header>پروژه آلف — نسخه MVP</header>
+
+<div class="window">
+    <div class="section-title">ساختار XML پروژه آلف</div>
+
+    <div class="xml">
+&lt;alf-project version="1.0"&gt;
+    &lt;meta&gt;
+        &lt;title&gt;پروژه آلف&lt;/title&gt;
+        &lt;author&gt;AREf999ms&lt;/author&gt;
+        &lt;status&gt;MVP&lt;/status&gt;
+    &lt;/meta&gt;
+
+    &lt;system name="TemplateOS"&gt;
+        &lt;module id="ui"&gt;
+            &lt;window size="full" theme="dark"&gt;
+                &lt;text&gt;به پروژه آلف خوش آمدید&lt;/text&gt;
+            &lt;/window&gt;
+        &lt;/module&gt;
+
+        &lt;module id="engine"&gt;
+            &lt;config&gt;
+                &lt;mode&gt;development&lt;/mode&gt;
+                &lt;version&gt;0.1-alpha&lt;/version&gt;
+            &lt;/config&gt;
+        &lt;/module&gt;
+    &lt;/system&gt;
+
+    &lt;pages&gt;
+        &lt;page id="home"&gt;
+            &lt;title&gt;صفحه اصلی&lt;/title&gt;
+            &lt;content&gt;
+                این نسخه اولیه (MVP) پروژه آلف است.
+            &lt;/content&gt;
+        &lt;/page&gt;
+
+        &lt;page id="about"&gt;
+            &lt;title&gt;درباره آلف&lt;/title&gt;
+            &lt;content&gt;
+                سیستم مبتنی بر TemplateOS + XML برای توسعه سریع.
+            &lt;/content&gt;
+        &lt;/page&gt;
+    &lt;/pages&gt;
+
+&lt;/alf-project&gt;
+    </div>
+</div>
+
+</body>
+</html>
