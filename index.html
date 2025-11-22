@@ -1,509 +1,223 @@
 <!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ALF — اتاق مزایده (Auction Room) — پلاگین</title>
-<style>
-  :root{
-    --bg:#071026; --panel:#0b2030; --accent:#f59e0b; --muted:#9fd6e0; --card:#021026;
-    --danger:#ef4444; --good:#10b981;
-  }
-  html,body{height:100%;margin:0;font-family: "Vazirmatn", "Segoe UI", Roboto, Arial, sans-serif;background:linear-gradient(180deg,#041025,#071026);color:#e6fbff}
-  .wrap{display:flex;gap:12px;padding:14px;box-sizing:border-box;height:100vh}
-  .left{flex:1;background:var(--panel);padding:12px;border-radius:12px;overflow:auto;box-shadow:0 12px 30px rgba(0,0,0,0.6)}
-  .right{width:420px;background:linear-gradient(180deg,#081a2a,#041423);padding:12px;border-radius:12px;display:flex;flex-direction:column;box-shadow:0 12px 30px rgba(0,0,0,0.6)}
-  header{display:flex;align-items:center;gap:10px}
-  h1{margin:0;font-size:20px}
-  .controls{margin-left:auto;display:flex;gap:8px}
-  .btn{background:var(--accent);color:#082022;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
-  .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:8px;color:var(--muted);cursor:pointer}
-  .card{background:var(--card);padding:12px;border-radius:10px;margin-top:12px}
-  .small{font-size:13px;opacity:0.9}
-  /* Auction info */
-  .auction-top{display:flex;gap:12px;align-items:center}
-  .price-big{font-size:28px;font-weight:800;color:var(--accent)}
-  .timer-badge{background:#021026;padding:8px 12px;border-radius:10px;font-weight:700}
-  /* bids list */
-  .bids{margin-top:10px;max-height:320px;overflow:auto;padding-right:6px}
-  .bid-item{display:flex;justify-content:space-between;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:8px}
-  .bid-item .meta{opacity:0.95}
-  .bid-high{border:2px solid rgba(245,158,11,0.18)}
-  /* participants */
-  .participants{display:flex;flex-direction:column;gap:8px;margin-top:10px}
-  .participant{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02)}
-  .input-row{display:flex;gap:8px;margin-top:10px}
-  input[type="text"], input[type="number"]{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;flex:1}
-  .tiny{font-size:12px;color:var(--muted)}
-  footer{margin-top:10px;font-size:12px;color:var(--muted)}
-  /* modal */
-  .modal-back{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:80}
-  .modal{background:linear-gradient(180deg,#0b2240,#061427);padding:18px;border-radius:12px;width:min(760px,96%);color:#e6fbff}
-  label{display:block;margin-bottom:6px;font-size:13px;color:var(--muted)}
-  .ok{background:var(--good);color:#052; padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
-  .danger{background:var(--danger);color:white;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
-  @media (max-width:900px){ .wrap{flex-direction:column} .right{width:100%} }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>سند پروژه — موبایل دست‌ساز و سیستم اپلیکیشن دو‌بخشی</title>
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#7dd3fc;
+      --panel:#071026; --glass:rgba(255,255,255,0.02);
+      font-family: "Vazirmatn", "Tahoma", sans-serif;
+    }
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#071427 0%, #05111b 100%);color:#e6eef6}
+    .container{max-width:1100px;margin:28px auto;padding:28px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;box-shadow:0 6px 30px rgba(2,6,23,0.6)}
+    header{display:flex;gap:16px;align-items:center;margin-bottom:18px}
+    header h1{margin:0;font-size:1.6rem}
+    header p{margin:0;color:var(--muted);font-size:0.95rem}
+    .meta{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;color:var(--muted);font-size:0.9rem}
+    section{background:var(--card);margin:14px 0;padding:16px;border-radius:10px}
+    h2{margin:0 0 8px 0;font-size:1.1rem;color:var(--accent)}
+    p{margin:8px 0;color:#dbe9f5;line-height:1.6}
+    ul{margin:8px 0 8px 20px;color:var(--muted);line-height:1.6}
+    .note{background:var(--glass);padding:10px;border-radius:8px;color:var(--muted);font-size:0.95rem}
+    details{margin:10px 0;background:rgba(255,255,255,0.01);padding:10px;border-radius:8px}
+    summary{cursor:pointer;font-weight:600;color:var(--accent)}
+    .cols{display:grid;grid-template-columns:1fr 320px;gap:18px}
+    .side{padding:12px;background:linear-gradient(180deg, rgba(0,0,0,0.15), rgba(255,255,255,0.01));border-radius:8px}
+    .btn{display:inline-block;padding:8px 12px;border-radius:8px;background:transparent;border:1px solid rgba(125,211,252,0.18);color:var(--accent);text-decoration:none;font-weight:600}
+    footer{margin-top:18px;color:var(--muted);font-size:0.9rem;text-align:left}
+    pre.code{background:#001021;padding:12px;border-radius:8px;overflow:auto;color:#bfeafc;font-size:0.9rem}
+    @media (max-width:900px){.cols{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
-<div class="wrap" role="application" aria-label="ALF Auction Room">
-  <div class="left" id="mainLeft">
+  <div class="container" role="main">
     <header>
-      <h1>اتاق مزایده — ALF</h1>
-      <div class="controls" id="mainControls">
-        <div class="tiny" id="tokenText">توکن: <strong id="tokenVal">—</strong></div>
-        <button class="ghost" id="genTokenBtn">ساخت توکن</button>
-        <button class="ghost" id="downloadLogBtn">دانلود لاگ</button>
-        <button class="ghost" id="exportCsvBtn">صدور CSV</button>
+      <div>
+        <h1>سند پروژه — موبایل دست‌ساز و سیستم اپلیکیشن دو‌بخشی</h1>
+        <p>نسخهٔ ساختاریافته و خوانا از توضیحات پروژه — شامل سخت‌افزار، نرم‌افزار، معماری، امنیت و اهداف محصول</p>
+        <div class="meta">
+          <span>نویسنده: عارف (۱۸ ساله)</span>
+          <span>زبان: فارسی (RTL)</span>
+          <span>قالب: HTML نمایش سند</span>
+        </div>
       </div>
     </header>
 
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div>
-          <div class="small">محصول در مزایده</div>
-          <div class="price-big" id="itemTitle">ساعت لوکس — مدل ویژه</div>
-          <div class="tiny">شناسه محصول: <span id="itemId">P-001</span></div>
-        </div>
-        <div style="text-align:left">
-          <div class="small">وضعیت مزایده</div>
-          <div class="timer-badge" id="timerDisplay">--:--:--</div>
-        </div>
-      </div>
+    <section id="summary">
+      <h2>خلاصهٔ پروژه</h2>
+      <p>
+        این پروژه ساخت یک «موبایل دست‌ساز» و یک سیستم نرم‌افزاری دو‌بخشی است:
+        <strong>برنامهٔ ۱ (داشبورد)</strong> که توسط کاربر/ادمین استفاده می‌شود و <strong>برنامهٔ ۲</strong> که به‌صورت خودکار تولید و نصب می‌شود و در اختیار مخاطبان قرار می‌گیرد.
+      </p>
+      <p class="note">هدف: ساخت یک هاست/دستگاه و اپلیکیشن که ارتباط صوتی (ویس‌چت) را با اولویت حفظ حریم خصوصی تسهیل کند. طراحی برای استفادهٔ ساده (تک‌دکمه/چرخانندهٔ آنالوگ) و اجرای رابط‌های درگ‌اند‌دراپ برای کاتالوگ و روم‌ها.</p>
+    </section>
 
-      <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
-        <div>
-          <div class="small">قیمت فعلی (آخرین پیشنهاد)</div>
-          <div class="price-big" id="currentPrice">—</div>
-        </div>
-        <div style="margin-left:auto">
-          <div class="small">حداقل افزایش</div>
-          <div class="tiny" id="minIncrDisplay">—</div>
-        </div>
-      </div>
+    <section id="hardware">
+      <h2>۱. سخت‌افزار موبایل دست‌ساز</h2>
+      <ul>
+        <li><strong>حذف مسیرهای ردیابی:</strong> حذف تماس صوتی سلولی، SMS، بلوتوث، NFC، GPS و هر پروتکل ردیاب؛ تنها مسیر ارتباطی: اینترنت (سیم‌کارت «خط سفید»).</li>
+        <li><strong>بدون IMEI و سرویس‌های ابری:</strong> دستگاه فاقد سرویس‌های معمول گوشی هوشمند و سنسورهای ردیاب است.</li>
+        <li><strong>ماژول Voice Changer سخت‌افزاری:</strong> دو حالت صدا (مرد/زن). قرارگیری بین میکروفون و برد به‌گونه‌ای که خروجی خام در سیستم‌عامل وارد نشود.</li>
+        <li><strong>فویل ضد ردیابی (EM shielding):</strong> پوشش داخلی برای کاهش نشت امواج و یک پنجرهٔ آنتن کوچک.</li>
+        <li><strong>HF رادیویی (اختیاری/پشتیبان):</strong> کانال پشتیبان رمزگذاری‌شده با هدف کاهش قابلیت شنود هدفمند.</li>
+        <li><strong>ورودی و کنترل ساده:</strong> استفاده از بردهای قدیمی (نوکیا)، چرخانندهٔ آنالوگ برای انتخاب و UI با متن کوتاه و آیکن‌های بزرگ.</li>
+      </ul>
+    </section>
 
-      <div class="card">
-        <div style="display:flex;align-items:center;gap:8px">
-          <input type="text" id="bidderName" placeholder="نام شرکت‌کننده (نمایشی)">
-          <input type="number" id="bidAmount" placeholder="مبلغ پیشنهادی (عدد)" min="1">
-          <button class="btn" id="placeBidBtn">ثبت پیشنهاد</button>
-        </div>
-        <div class="tiny" style="margin-top:8px">پیشنهادها به‌صورت محلی ذخیره می‌شوند و برای نمایش/آزمایش هستند.</div>
-      </div>
+    <section id="software-architecture">
+      <h2>۲. معماری نرم‌افزاری — اپلیکیشن دو‌بخشی</h2>
+      <p>سیستم شامل دو برنامهٔ مستقل ولی مرتبط است:</p>
+      <ul>
+        <li><strong>برنامه ۱ — داشبورد (Dashboard):</strong> ورود تنها با ProtonMail، ساخت خودکار برنامهٔ ۲، مدیریت لینک‌ها، تولید توکن، ویرایشگر سایت درگ‌انددرپ (مشابه Webzi) و ابزار اتصال به GitHub.</li>
+        <li><strong>برنامه ۲ — اپ تولیدشده توسط داشبورد:</strong> حالت پیش‌فرض: چت‌روم؛ قابل تغییر به «فقط سایت»، «فقط روم» یا هر دو هم‌زمان.</li>
+      </ul>
 
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <strong>فهرست پیشنهادها</strong>
-          <div class="small">مجموع: <span id="bidsCount">0</span></div>
-        </div>
-        <div class="bids" id="bidsList" aria-live="polite">
-          <!-- bids appended here -->
-        </div>
-      </div>
+      <details>
+        <summary>عملکرد ورود و تولید اپ</summary>
+        <p>ورود با ProtonMail؛ پس از لاگین، صفحهٔ لودینگ ظاهر می‌شود و برنامهٔ ۲ به‌صورت خودکار ایجاد و لینک دانلود آن ارائه می‌گردد. برنامهٔ ۱ پس از آن داشبورد کامل را نمایش می‌دهد.</p>
+      </details>
+    </section>
 
-      <div class="card">
-        <strong>لاگ سیستم</strong>
-        <div id="systemLog" style="max-height:160px;overflow:auto;margin-top:8px;padding:8px;background:rgba(255,255,255,0.02);border-radius:8px;font-size:13px"></div>
-      </div>
+    <section id="chat-structure">
+      <h2>۳. ساختار چت و نقش‌ها</h2>
+      <ul>
+        <li><strong>حالت‌های ورود:</strong> کاربر عادی، ورود با ProtonMail، و حالت ادمین با PIN.</li>
+        <li><strong>صفحات داخل اپ ۲:</strong> برای ادمین دو صفحه وجود دارد: صفحهٔ چت با مخاطبین و صفحهٔ کنترل ربات؛ برای مخاطب فقط پیام ادمین و صفحهٔ ربات نمایش داده می‌شود.</li>
+        <li><strong>ربات:</strong> سد بین ادمین و مخاطب است؛ وظایفی مثل باز/بستن چت، زمان‌بندی مجوزها، اطلاع‌رسانی و مدیریت دسترسی را انجام می‌دهد.</li>
+        <li><strong>تأکید بر ویس‌چت:</strong> اصل تجربهٔ کاربری حول ویس‌چت سخت‌افزاری است — استفاده با هدست/ایرپاد.</li>
+      </ul>
+    </section>
 
-    </div>
-  </div>
+    <section id="tokens-root">
+      <h2>۴. توکن‌ها و «روت چت» قانونی</h2>
+      <p>
+        هر نمونهٔ برنامهٔ ۲ توکن اختصاصی دارد. برای ایجاد «روت چت» دو توکن (توکن برنامهٔ خریدار و توکن برنامهٔ فروشنده) وارد داشبورد می‌شوند؛ سپس یک چت اختصاصی با سطح دسترسی بالا ساخته می‌شود.
+      </p>
+      <p class="note">قابلیت روت به‌صورتی که در سند توضیح داده‌شده (تأیید سه‌مرحله‌ای و قطع روت با پایان جلسه) طراحی می‌شود. توضیحات اولیه در سند ذکر شده‌اند.</p>
+    </section>
 
-  <aside class="right" id="mainRight">
-    <div style="display:flex;justify-content:space-between;align-items:center">
+    <section id="security">
+      <h2>۵. امنیت و حفاظت حریم خصوصی</h2>
+      <ul>
+        <li>استفاده از Tor + WebRTC + Hidden Services برای کاهش قابلیت ردیابی.</li>
+        <li>فویل ضد نشت امواج و استفاده از سیم‌کارت‌های «خط سفید» برای کاهش ردیابی سخت‌افزاری.</li>
+        <li>Voice Changer سخت‌افزاری برای حذف امضای صوتی.</li>
+        <li>اپ بسیار ساده بدون سرویس‌های جاسوسی سیستم‌عامل، حذف IMEI/GPS/سرویس‌های ابری.</li>
+      </ul>
+      <p class="note">این بخش اهداف امنیتی را توصیف می‌کند؛ توجه داشته باشید که پیاده‌سازی عملیاتیِ برخی از این مکانیزم‌ها نیازمند بررسی قانونی و اخلاقی است.</p>
+    </section>
+
+    <section id="ux-modders">
+      <h2>۶. تجربهٔ کاربری، توسعه‌پذیری و مودسازها</h2>
+      <ul>
+        <li>روحیهٔ پروژه مشابه TempleOS در سادگی و فلسفهٔ طراحی — تا جای ممکن XML-based.</li>
+        <li>برنامه باید یک‌بار نوشته شود و روی پلتفرم‌های متعدد اجرا شود (هدف: پوشش حداکثری دستگاه‌ها و پلتفرم‌ها).</li>
+        <li>پشتیبانی از مودسازها: امکان استفاده از بدنهٔ برنامه برای تولید مود، تغییرات اساسی و ساخت نسخه‌های جدید.</li>
+        <li>طراحی ماژولار تا حتی کاربران دارای دانش برنامه‌نویسی بتوانند از اپک‌ادیتورها برای تغییر و توسعه استفاده کنند.</li>
+      </ul>
+    </section>
+
+    <section id="business-use">
+      <h2>۷. سناریوی استفاده و بازار هدف</h2>
+      <p>بازار هدف در سند به‌صورت کلی شرح داده شده: فروشندگان ثروتمند که می‌خواهند معاملات خصوصی و امن انجام دهند؛ اپ برای ایجاد کاتالوگ و برگزاری مزایده‌ها طراحی شده است.</p>
+      <p class="note">در سند توضیح داده شده که کارکردهای خاص تجارت و «روت چت» باید با آگاهی کامل طرفین و در چهارچوب توافق‌شده انجام شود.</p>
+    </section>
+
+    <div class="cols">
       <div>
-        <strong>کنترل ادمین</strong>
-        <div class="tiny">ورود با PIN</div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button class="ghost" id="adminPinBtn">ورود ادمین</button>
-        <button class="btn" id="openWindowBtn">پنجرهٔ جدا (پلاگین)</button>
-      </div>
-    </div>
+        <section id="deliverables">
+          <h2>۸. تحویل‌ها و خروجی‌های قابل ساخت</h2>
+          <ul>
+            <li>نسخهٔ رسمی PDF از سند</li>
+            <li>نسخهٔ Word</li>
+            <li>نسخهٔ XML (قابل استفاده در TemplateOS)</li>
+            <li>نسخهٔ مخصوص ارائه برای سازندگان برد و تیم‌های سخت‌افزاری</li>
+            <li>طراحی UI/UX و دیاگرام‌های معماری و امنیت</li>
+            <li>نسخهٔ حرفه‌ای جهت ارسال به سازندگان</li>
+          </ul>
+          <p class="note">در صورت تمایل، می‌توانم یکی از این خروجی‌ها را همین‌جا (مثلاً XML یا PDF) تهیه کنم؛ فقط بگویید کدام فرمت را می‌خواهید.</p>
+        </section>
 
-    <div class="card" style="margin-top:12px">
-      <div class="small">تنظیمات مزایده</div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <input type="number" id="startPrice" placeholder="قیمت شروع" value="1000">
-        <input type="number" id="minIncrement" placeholder="حداقل افزایش" value="100">
+        <section id="constraints">
+          <h2>۹. محدودیت‌ها و نکات حقوقی (یادداشت)</h2>
+          <p>
+            این سند دیدگاهی فنی و طراحی ارائه می‌دهد. پیاده‌سازی برخی ویژگی‌های مربوط به حریم خصوصی، روت یا مخفی‌سازی هویت می‌تواند پیامدهای قانونی یا اخلاقی داشته باشد—بنابراین قبل از اجرا، بررسی‌های قانونی و اخلاقی لازم است.
+          </p>
+        </section>
       </div>
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <button class="btn" id="startAuctionBtn">شروع حراج (پیش‌نمایش)</button>
-        <button class="ghost" id="stopAuctionBtn">توقف</button>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button class="ghost" id="lockChatBtn">قفل چت (فقط ادمین)</button>
-        <button class="ghost" id="unlockChatBtn">باز کردن چت</button>
-      </div>
-      <div style="margin-top:10px" class="tiny">توضیح: در حالت قفل، فقط ادمین می‌تواند پیشنهاد بفرستد.</div>
-    </div>
 
-    <div class="card" style="margin-top:12px">
-      <strong>شرکت‌کننده‌ها</strong>
-      <div class="participants" id="participantsList">
-        <!-- participants -->
-      </div>
-      <div style="margin-top:8px">
-        <input type="text" id="newParticipantName" placeholder="افزودن شرکت‌کننده (مثال: ali)">
-        <button class="btn" id="addParticipantBtn">افزودن</button>
-      </div>
+      <aside class="side">
+        <h2>فهرست سریع</h2>
+        <nav>
+          <ul style="list-style:none;padding:0;margin:6px 0 0 0">
+            <li><a class="btn" href="#summary">خلاصه</a></li><br/>
+            <li><a class="btn" href="#hardware">سخت‌افزار</a></li><br/>
+            <li><a class="btn" href="#software-architecture">معماری نرم‌افزار</a></li><br/>
+            <li><a class="btn" href="#chat-structure">ساختار چت</a></li><br/>
+            <li><a class="btn" href="#tokens-root">توکن‌ها / روت</a></li><br/>
+            <li><a class="btn" href="#security">امنیت</a></li><br/>
+            <li><a class="btn" href="#ux-modders">مودسازها</a></li><br/>
+            <li><a class="btn" href="#deliverables">تحویل‌ها</a></li>
+          </ul>
+        </nav>
+
+        <details style="margin-top:12px">
+          <summary>اقدامات پیشنهادی (خلاصه)</summary>
+          <ol style="text-align:right;color:var(--muted);">
+            <li>تنظیم محدودهٔ فنی و حقوقی پیش از پیاده‌سازی.</li>
+            <li>شروع با نمونهٔ نرم‌افزاری (داشبورد و اپ ۲) در محیط شبیه‌سازی.</li>
+            <li>طراحی UI ساده و تست با کاربران هدف.</li>
+          </ol>
+        </details>
+
+        <div style="margin-top:12px">
+          <button class="btn" id="export-xml">ساخت XML</button>
+          <button class="btn" id="export-txt">دریافت متن</button>
+        </div>
+      </aside>
     </div>
 
     <footer>
-      <div class="tiny">نسخهٔ آفلاین و نمایشی — هیچ دسترسی به دوربین یا شبکه اجرا نمی‌شود.</div>
+      <p>نسخهٔ نمایش: سند ساختار‌یافته پروژه. اگر می‌خواهید همین سند را به XML یا PDF تبدیل کنم یا نسخهٔ مخصوص ارائه تهیه شود، نام فرمت را اعلام کنید تا آن را تولید کنم.</p>
     </footer>
-  </aside>
-</div>
+  </div>
 
-<!-- modal root -->
-<div id="modalRoot" style="display:none"></div>
-
-<script>
-/* Auction Room — Offline Single-file Implementation
-   - localStorage keys: auction_state_v1, auction_bids_v1, auction_log_v1, auction_participants_v1, auction_settings_v1
-   - admin PIN default: 1234 (changeable via console/localStorage)
-   - open window plugin via data: URL and postMessage sync
-*/
-
-// keys
-const STATE_KEY = 'auction_state_v1';
-const BIDS_KEY = 'auction_bids_v1';
-const LOG_KEY = 'auction_log_v1';
-const PART_KEY = 'auction_participants_v1';
-const SETT_KEY = 'auction_settings_v1';
-const TOKEN_KEY = 'auction_token_v1';
-
-// default settings
-const defaultSettings = { adminPin: '1234', minIncrement: 100, startPrice: 1000 };
-
-// in-memory state
-let state = {
-  isAdmin: false,
-  running: false,
-  endsAt: null,
-  timerInterval: null,
-  childWindow: null,
-  allowUserBids: false
-};
-
-// helpers
-const $ = (s,root=document)=>root.querySelector(s);
-const now = ()=>Date.now();
-function logSystem(msg){ const el = $('#systemLog'); const p = document.createElement('div'); p.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`; el.prepend(p); saveLog(msg); }
-
-// storage helpers
-function saveSettings(s){ localStorage.setItem(SETT_KEY, JSON.stringify(s)); }
-function loadSettings(){ const s = JSON.parse(localStorage.getItem(SETT_KEY) || 'null'); if(!s){ saveSettings(defaultSettings); return defaultSettings; } return s; }
-function saveBids(arr){ localStorage.setItem(BIDS_KEY, JSON.stringify(arr)); }
-function loadBids(){ return JSON.parse(localStorage.getItem(BIDS_KEY) || '[]'); }
-function saveLogEntry(entry){ const arr = JSON.parse(localStorage.getItem(LOG_KEY) || '[]'); arr.unshift(entry); localStorage.setItem(LOG_KEY, JSON.stringify(arr)); }
-function saveLog(msg){ saveLogEntry({ts: now(), text: msg}); }
-function saveParticipants(arr){ localStorage.setItem(PART_KEY, JSON.stringify(arr)); }
-function loadParticipants(){ return JSON.parse(localStorage.getItem(PART_KEY) || '[]'); }
-function saveState(s){ localStorage.setItem(STATE_KEY, JSON.stringify(s)); }
-function loadState(){ return JSON.parse(localStorage.getItem(STATE_KEY) || 'null'); }
-
-// init
-function init(){
-  const settings = loadSettings();
-  $('#minIncrDisplay').textContent = settings.minIncrement;
-  $('#startPrice').value = settings.startPrice;
-  $('#minIncrement').value = settings.minIncrement;
-  $('#currentPrice').textContent = '—';
-  $('#bidsCount').textContent = loadBids().length;
-  $('#tokenVal').textContent = localStorage.getItem(TOKEN_KEY) || 'ندارد';
-  renderParticipants();
-  renderBids();
-  renderLog();
-  bindUI();
-  // try to restore running auction
-  const st = loadState();
-  if(st && st.running && st.endsAt){ state.running = true; state.endsAt = st.endsAt; tickTimer(); state.timerInterval = setInterval(tickTimer, 1000); updateUIRunning(); }
-}
-
-// UI bind
-function bindUI(){
-  $('#placeBidBtn').addEventListener('click', placeBid);
-  $('#genTokenBtn').addEventListener('click', genToken);
-  $('#downloadLogBtn').addEventListener('click', downloadLog);
-  $('#exportCsvBtn').addEventListener('click', exportCsv);
-  $('#addParticipantBtn').addEventListener('click', addParticipant);
-  $('#startAuctionBtn').addEventListener('click', ()=> startAuctionFromInputs());
-  $('#stopAuctionBtn').addEventListener('click', stopAuction);
-  $('#lockChatBtn').addEventListener('click', ()=> setChatLock(true));
-  $('#unlockChatBtn').addEventListener('click', ()=> setChatLock(false));
-  $('#adminPinBtn').addEventListener('click', showAdminModal);
-  $('#openWindowBtn').addEventListener('click', openChildWindow);
-}
-
-// token
-function genToken(){
-  const t = Math.random().toString(36).slice(2,10).toUpperCase() + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
-  localStorage.setItem(TOKEN_KEY, t);
-  $('#tokenVal').textContent = t;
-  logSystem('توکن ساخته شد: ' + t);
-  alert('توکن ساخته شد: ' + t + '\n(نمایشی و محلی)');
-}
-
-// participants
-function addParticipant(){
-  const name = $('#newParticipantName').value.trim();
-  if(!name){ alert('نام وارد نشده'); return; }
-  const arr = loadParticipants();
-  arr.push({name, joined: now()});
-  saveParticipants(arr);
-  $('#newParticipantName').value='';
-  renderParticipants();
-  logSystem('شرکت‌کننده افزوده شد: ' + name);
-}
-function renderParticipants(){
-  const arr = loadParticipants();
-  const wrap = $('#participantsList'); wrap.innerHTML='';
-  for(const p of arr){
-    const div = document.createElement('div'); div.className='participant'; div.innerHTML = `<div>${escapeHtml(p.name)}</div><div class="tiny">joined</div>`;
-    wrap.appendChild(div);
-  }
-}
-
-// bids
-function placeBid(){
-  const name = $('#bidderName').value.trim() || 'ناشناس';
-  let amount = Number($('#bidAmount').value);
-  if(isNaN(amount) || amount <= 0){ alert('مبلغ معتبر وارد کن'); return; }
-  // check permissions
-  if(!state.isAdmin && !state.allowUserBids){ alert('فعلا فقط ادمین می‌تواند پیشنهاد بده'); return; }
-  const bids = loadBids();
-  const current = bids.length ? bids[bids.length-1].amount : Number($('#startPrice').value) - Number($('#minIncrement').value);
-  const minInc = Number($('#minIncrement').value) || loadSettings().minIncrement;
-  if(amount < current + minInc){ alert(`حداقل باید ${current + minInc} یا بیشتر باشد (حداقل افزایش ${minInc}).`); return; }
-  const bid = {id: 'b' + Date.now(), bidder: name, amount, ts: now()};
-  bids.push(bid); saveBids(bids);
-  renderBids();
-  $('#bidAmount').value='';
-  $('#bidderName').value='';
-  logSystem(`پیشنهاد ثبت شد: ${name} — ${amount}`);
-  // broadcast to child window
-  syncChildWindow();
-}
-function renderBids(){
-  const bids = loadBids();
-  const wrap = $('#bidsList'); wrap.innerHTML='';
-  for(let i=0;i<bids.length;i++){
-    const b = bids[i];
-    const el = document.createElement('div');
-    el.className = 'bid-item' + (i===bids.length-1 ? ' bid-high' : '');
-    el.innerHTML = `<div class="meta"><strong>${escapeHtml(b.bidder)}</strong><div class="tiny">${new Date(b.ts).toLocaleString()}</div></div><div style="text-align:left"><div style="font-weight:800">${b.amount}</div></div>`;
-    wrap.appendChild(el);
-  }
-  $('#bidsCount').textContent = bids.length;
-  $('#currentPrice').textContent = bids.length ? bids[bids.length-1].amount : '—';
-}
-
-// log
-function renderLog(){
-  const arr = JSON.parse(localStorage.getItem(LOG_KEY) || '[]');
-  const el = $('#systemLog'); el.innerHTML='';
-  for(const item of arr.slice(0,200)){
-    const p = document.createElement('div');
-    p.textContent = `${new Date(item.ts).toLocaleTimeString()} — ${item.text}`;
-    el.appendChild(p);
-  }
-}
-
-// admin
-function showAdminModal(){
-  const root = $('#modalRoot'); root.innerHTML = `<div class="modal-back"><div class="modal"><h3>ورود ادمین</h3><label>PIN</label><input id="modalPin" type="text" style="width:100%;padding:8px;border-radius:8px;background:transparent;color:inherit;border:1px solid rgba(255,255,255,0.04)"><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="ghost" id="modalCancel">انصراف</button><button class="ok" id="modalOk">ورود</button></div></div></div>`; root.style.display='block';
-  $('#modalCancel').onclick = ()=>{ root.style.display='none'; root.innerHTML=''; };
-  $('#modalOk').onclick = ()=>{
-    const pin = $('#modalPin').value.trim();
-    const settings = loadSettings();
-    if(pin === settings.adminPin){
-      state.isAdmin = true; root.style.display='none'; root.innerHTML=''; logSystem('ادمین وارد شد'); alert('ورود ادمین موفق');
-      applyAdminUI();
-    } else {
-      alert('PIN اشتباه است');
-    }
-  };
-}
-function applyAdminUI(){
-  // show admin functions visually by highlighting
-  $('#startAuctionBtn').classList.add('btn');
-  $('#lockChatBtn').classList.remove('ghost');
-}
-
-// auction timer
-function startAuctionFromInputs(){
-  if(!state.isAdmin){ alert('فقط ادمین می‌تواند حراج را شروع کند'); return; }
-  const startPrice = Number($('#startPrice').value) || loadSettings().startPrice;
-  const minInc = Number($('#minIncrement').value) || loadSettings().minIncrement;
-  // reset bids
-  saveBids([]);
-  renderBids();
-  $('#currentPrice').textContent = startPrice;
-  $('#minIncrDisplay').textContent = minInc;
-  // set allowUserBids false initially
-  state.allowUserBids = false;
-  // set duration prompt
-  let mins = prompt('مدت زمان حراج (دقیقه):', '10');
-  mins = Number(mins);
-  if(isNaN(mins) || mins <= 0){ alert('مدت زمان نامعتبر'); return; }
-  const durMs = mins * 60 * 1000;
-  state.endsAt = now() + durMs;
-  state.running = true;
-  if(state.timerInterval) clearInterval(state.timerInterval);
-  state.timerInterval = setInterval(tickTimer, 1000);
-  saveState({running: true, endsAt: state.endsAt});
-  logSystem(`حراج شروع شد — مدت ${mins} دقیقه — قیمت شروع ${startPrice}`);
-  postBotMessage('حراج شروع شد. لطفا پیشنهادها را ثبت کنید.');
-  syncChildWindow();
-  updateUIRunning();
-}
-
-function tickTimer(){
-  if(!state.running || !state.endsAt){ $('#timerDisplay').textContent='--:--:--'; return; }
-  const left = Math.max(0, Math.floor((state.endsAt - now())/1000));
-  const hh = String(Math.floor(left/3600)).padStart(2,'0');
-  const mm = String(Math.floor((left%3600)/60)).padStart(2,'0');
-  const ss = String(left%60).padStart(2,'0');
-  $('#timerDisplay').textContent = `${hh}:${mm}:${ss}`;
-  if(left <= 0){
-    finishAuction();
-  }
-}
-
-function finishAuction(){
-  if(state.timerInterval){ clearInterval(state.timerInterval); state.timerInterval = null; }
-  state.running = false;
-  state.endsAt = null;
-  saveState({running:false, endsAt:null});
-  postBotMessage('حراج به پایان رسید.');
-  // open bidding to all
-  state.allowUserBids = true;
-  updateUIRunning();
-  logSystem('حراج پایان یافت.');
-  syncChildWindow();
-}
-
-function stopAuction(){
-  if(!state.running){ alert('حراج در حال اجرا نیست'); return; }
-  if(state.timerInterval){ clearInterval(state.timerInterval); state.timerInterval = null; }
-  state.running = false; state.endsAt = null; saveState({running:false, endsAt:null});
-  postBotMessage('حراج توسط ادمین متوقف شد.');
-  state.allowUserBids = false;
-  updateUIRunning();
-  logSystem('حراج توسط ادمین متوقف شد');
-  syncChildWindow();
-}
-
-function postBotMessage(text){
-  const bids = loadBids();
-  // store bot message into log (not into bids)
-  saveLog(text);
-  renderLog();
-  // also push into bids as system note if desired (optional)
-  // broadcast to child windows
-  syncChildWindow();
-}
-
-// chat lock
-function setChatLock(lock){
-  state.allowUserBids = !lock;
-  logSystem(lock ? 'چت قفل شد (فقط ادمین)' : 'چت باز شد (کاربران می‌توانند پیشنهاد دهند)');
-  updateUIRunning();
-  syncChildWindow();
-}
-
-// child window (plugin) open
-function openChildWindow(){
-  // create a small HTML via data URI so it's self-contained and offline
-  const currentBids = loadBids();
-  const token = localStorage.getItem(TOKEN_KEY) || '';
-  const allow = state.allowUserBids || state.isAdmin;
-  const childHtml = `
-  <!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>روم — پلاگین</title>
-  <style>body{margin:0;font-family:sans-serif;background:#071026;color:#e6fbff}header{background:#0b2333;padding:8px;text-align:center;font-weight:700}main{padding:10px}#msgs{height:260px;overflow:auto;background:#021026;padding:8px;border-radius:8px}input{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}button{background:${escapeForCss(''+getComputedStyle(document.documentElement).getPropertyValue('--accent')||'#f59e0b')};color:#082022;border:none;padding:8px 12px;border-radius:8px}</style></head>
-  <body><header>روم مزایده — پلاگین</header><main><div class="tiny">توکن: <strong>${token}</strong></div><div id="msgs"></div><div style="margin-top:8px;display:flex;gap:8px"><input id="inp" placeholder="${allow ? 'پیشنهاد...' : 'فعلاً فقط ادمین'}" ${allow ? '' : 'disabled'}><button id="send" ${allow ? '' : 'disabled'}>ارسال</button></div></main>
   <script>
-    const initial = ${JSON.stringify(currentBids)};
-    const area = document.getElementById('msgs');
-    function render(arr){ area.innerHTML=''; arr.forEach(m=>{ const d=document.createElement('div'); d.style.padding='6px'; d.style.margin='6px 0'; d.style.borderRadius='6px'; d.style.background='rgba(255,255,255,0.02)'; d.textContent = (m.bidder? '['+m.bidder+'] ':'') + m.amount; area.appendChild(d);}); area.scrollTop = area.scrollHeight; }
-    render(initial);
-    document.getElementById('send').addEventListener('click', ()=>{ const v = document.getElementById('inp').value.trim(); if(!v) return; if(window.opener) window.opener.postMessage({type:'child_bid', text:v}, '*'); document.getElementById('inp').value=''; });
-    window.addEventListener('message', (e)=>{ try{ const d=e.data; if(d && d.type==='sync_bids'){ render(d.payload); } }catch(e){} });
-    // notify opener ready
-    if(window.opener) window.opener.postMessage({type:'child_ready'}, '*');
-  </script></body></html>
-  `;
-  const url = 'data:text/html;charset=utf-8,' + encodeURIComponent(childHtml);
-  const w = window.open(url, '_blank', 'width=420,height=420,menubar=no,toolbar=no');
-  state.childWindow = w;
-}
-
-// listen to child
-window.addEventListener('message', (ev)=>{
-  try{
-    const d = ev.data;
-    if(!d) return;
-    if(d.type === 'child_bid'){ // child asked to place bid (text)
-      const text = String(d.text).trim();
-      // interpret as number attempt
-      const num = Number(text);
-      if(isNaN(num)){ alert('مقدار نامعتبر از پنجرهٔ جدا ارسال شد'); return; }
-      // place bid under anonymous name
-      if(!state.allowUserBids && !state.isAdmin){ alert('فعلا فقط ادمین می‌تواند پیشنهاد دهد'); return; }
-      const bids = loadBids();
-      const current = bids.length ? bids[bids.length-1].amount : Number($('#startPrice').value) - Number($('#minIncrement').value);
-      const minInc = Number($('#minIncrement').value) || loadSettings().minIncrement;
-      if(num < current + minInc){ alert('پیشنهاد خیلی کم است'); return; }
-      bids.push({id:'b'+Date.now(), bidder:'پنجره-کاربر', amount:num, ts: now()});
-      saveBids(bids);
-      renderBids();
-      logSystem('پیشنهاد از پنجرهٔ جدا ثبت شد: ' + num);
-      syncChildWindow();
-    } else if(d.type === 'child_ready'){
-      // send current bids
-      try{ ev.source.postMessage({type:'sync_bids', payload: loadBids()}, '*'); } catch(e){}
+    // ساده: ساخت XML از محتوای اصلی (نسخهٔ متنی)
+    function escapeXml(unsafe) {
+      return unsafe.replace(/[<>&'"]/g, function(c){ return {'<':'&lt;','>':'&gt;','&':'&amp;',"'":'&apos;','"':'&quot;'}[c]; });
     }
-  }catch(e){}
-});
 
-// sync child window
-function syncChildWindow(){
-  if(state.childWindow && !state.childWindow.closed){
-    try{ state.childWindow.postMessage({type:'sync_bids', payload: loadBids()}, '*'); } catch(e){}
-  }
-}
+    document.getElementById('export-xml').addEventListener('click', function(){
+      const title = "سند پروژه — موبایل دست‌ساز و سیستم اپلیکیشن دو‌بخشی";
+      const sections = Array.from(document.querySelectorAll('section')).map(s=>{
+        const id = s.id || '';
+        const h = (s.querySelector('h2')||{innerText:''}).innerText;
+        const txt = s.innerText.replace(/^\s+|\s+$/g,'');
+        return `<section id="${id}"><title>${escapeXml(h)}</title><content>${escapeXml(txt)}</content></section>`;
+      }).join('');
+      const xml = `<?xml version="1.0" encoding="utf-8"?>\n<project>\n  <title>${escapeXml(title)}</title>\n  ${sections}\n</project>`;
+      const blob = new Blob([xml], {type: 'application/xml'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'project_alf.xml';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
 
-// utility
-function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); }
-function getComputedStyleVal(k){ return getComputedStyle(document.documentElement).getPropertyValue(k) || ''; }
-function escapeForCss(s){ return (''+s).replace(/"/g,'\\"'); }
-
-// export & download
-function downloadLog(){
-  const arr = JSON.parse(localStorage.getItem(LOG_KEY) || '[]');
-  const txt = arr.map(r=> new Date(r.ts).toLocaleString() + ' — ' + r.text).join('\\n');
-  const blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'auction_log.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-}
-function exportCsv(){
-  const bids = loadBids();
-  const rows = [['id','bidder','amount','ts']].concat(bids.map(b=>[b.id, b.bidder, b.amount, new Date(b.ts).toISOString()]));
-  const csv = rows.map(r=> r.map(v=> '"'+String(v).replace(/"/g,'""') +'"').join(',')).join('\\n');
-  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'}); const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'bids.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-}
-
-// download log wrapper
-function downloadLog(){ downloadLog; }
-
-// render functions called once init
-init();
-
-// expose some functions for console tweaking (optional)
-window.__ALF = { placeBid, startAuctionFromInputs, finishAuction, stopAuction, genToken };
-
-</script>
+    document.getElementById('export-txt').addEventListener('click', function(){
+      const text = Array.from(document.querySelectorAll('section')).map(s=>{
+        return (s.querySelector('h2')? s.querySelector('h2').innerText + "\n" : "") + s.innerText;
+      }).join("\n\n---\n\n");
+      const blob = new Blob([text], {type: 'text/plain;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'project_alf.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  </script>
 </body>
 </html>
